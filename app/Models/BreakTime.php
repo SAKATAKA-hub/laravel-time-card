@@ -14,7 +14,7 @@ class BreakTime extends Model
     */
     use HasFactory;
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = ['work_time_id','in','out'];
 

@@ -16,7 +16,8 @@ class Employee extends Model
 
     public $timestamps = true;
 
-    protected $fillable = ['group_id','name','color',];
+    protected $fillable = ['user_id','name','color','work_status',];
+
 
 
 

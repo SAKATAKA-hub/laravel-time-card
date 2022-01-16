@@ -18,6 +18,7 @@ class CreateBreakTimesTable extends Migration
             $table->unsignedBigInteger('work_time_id');
             $table->time('in');
             $table->time('out')->nullable()->default(null);
+            $table->timestamps();
 
             $table->foreign('work_time_id')
             ->references('id')->on('work_times') //存在しないidの登録は不可

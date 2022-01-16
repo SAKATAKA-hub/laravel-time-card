@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\EasyUserController;
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,3 +19,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+# 簡単ログインユーザーの作成
+Route::get('create_easy_user',[EasyUserController::class,'create_easy_user'])
+->name('create_easy_user');

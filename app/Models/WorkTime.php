@@ -14,9 +14,10 @@ class WorkTime extends Model
     */
     use HasFactory;
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = ['employee_id','date','in','out',];
+
 
 
 
