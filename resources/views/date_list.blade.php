@@ -50,25 +50,64 @@
 @section('main_content')
     <div class="table_container mb-5">
 
-        <table class="table bg-white" style="width: 900px;">
+        <table class="table bg-white text-center" style="width: 900px;">
             <thead class="border-secondary">
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">First</th>
-                    <th scope="col">Last</th>
-                    <th scope="col">Handle</th>
+                    <th scope="col">氏 名</th>
+                    <th scope="col">日 付</th>
+                    <th scope="col">就 業</th>
+                    <th scope="col">休 憩</th>
+                    <th scope="col">勤務時間(h)</th>
+                    <th scope="col">休憩時間(h)</th>
+                    <th scope="col">労働時間(h)</th>
+                    <th scope="col">深夜時間(h)</th>
+                    <th></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 @for ($i = 0; $i < 10; $i++)
                 <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
+                    <th scope="row">山田　太郎</th>
+                    <td>00日(月)</td>
+                    <td>08:00-17:00</td>
+                    <td>10:00-11:00(1.00)</td>
+                    <td>9.00</td>
+                    <td>2.00</td>
+                    <td>7.00</td>
+                    <td>0.00</td>
+                    <td><button class="btn btn-warning">修正</button></td>
+                    <td><button class="btn btn-danger">削除</button></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>14:00-15:00(1.00)</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 @endfor
             </tbody>
+            <tfoot class="border-secondary">
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col">90.00</th> <!--総勤務時間(h) -->
+                    <th scope="col">20.00</th> <!--総休憩時間(h) -->
+                    <th scope="col">70.00</th> <!--総労働時間(h) -->
+                    <th scope="col">0.00</th> <!--総深夜時間(h) -->
+                    <th></th>
+                    <th></th>
+                </tr>
+            </tfoot>
+
         </table>
 
     </div>
