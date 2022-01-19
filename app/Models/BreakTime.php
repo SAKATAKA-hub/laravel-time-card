@@ -37,47 +37,13 @@ class BreakTime extends Model
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * 休憩時間の算出
-     * ($break_time->hour)
-     *
-     *
-     * @return Int
-     */
-    public function getHourAttribute()
-    {
-        # m分刻み
-        $m = Method::getCutMin();
-
-        # 出退勤時間を"H:I:s"形式から"秒単位"に変換して、その差分を算出
-        $out_times = explode(':', $this->out);
-        $out_sec = (int)$out_times[0]*60*60 + (int)$out_times[1]*60 + (int)$out_times[2];
-        $in_times = explode(':', $this->in);
-        $in_sec = (int)$in_times[0]*60*60 + (int)$in_times[1]*60 + (int)$in_times[2];
-
-        $time_sec = $out_sec - $in_sec;
-
-        # "秒単位"の時間を"分単位に変換"
-        $time_min = $time_sec/60;
-
-        # $m分区切りで時間を"切り上げ"
-        $time_min = ceil($time_min/$m) * $m;
-
-        # "分単位"の時間を"時単位に変換"
-        $time_hour = $time_min/60;
-
-
-        return $time_hour;
-    }
-
-
 
     /**
      * 休憩時間のテキスト表示
      * ($break_time->text)
      *
      *
-     * @return Int //(00:00-00:00(0.00))
+     * @return String //( 00:00-00:00(0.00) )
      */
     public function getTextAttribute()
     {
@@ -87,6 +53,27 @@ class BreakTime extends Model
 
         return sprintf('%s-%s(%.2f)',$in,$out,$hour);
     }
+
+
+
+
+
+    /**
+     * 休憩時間の表示
+     * ($break_time->hour)
+     *
+     *
+     * @return String //(時)
+     */
+    public function getHourAttribute()
+    {
+        $time_hour = Method::breakHour($this->in, $this->out);
+
+        return sprintf('%.2f', $time_hour);
+    }
+
+
+
 
 
 

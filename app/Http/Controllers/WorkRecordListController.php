@@ -36,8 +36,13 @@ class WorkRecordListController extends Controller
 
 
         # test
+        $work_time = WorkTime::find(1);
         $break_time = breakTime::find(1);
-        dd( $break_time->text);
+
+
+        dd( $work_time->restrain_hour);
+
+
 
 
         return view('month_list');

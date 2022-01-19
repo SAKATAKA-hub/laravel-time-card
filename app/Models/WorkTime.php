@@ -41,21 +41,69 @@ class WorkTime extends Model
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * テスト
-     * ($work_time->test)
-     *
-     *
-     * @return String
-     */
-    public function getTestAttribute()
-    {
-        $in = Method::ceilTime($His = $this->in);
-        $out = Method::flloTime($His = $this->out);
 
-        return $in;
+    /**
+     * 勤務時間のテキスト表示
+     * ($work_time->text)
+     *
+     *
+     * @return String //(00:00-00:00)
+     */
+    public function getTextAttribute()
+    {
+        $in = substr($this->in, 0, 5);
+        $out = substr($this->out, 0, 5);
+
+        return sprintf('%s-%s',$in,$out);
     }
 
+
+
+
+    /**
+     * 勤務時間の表示
+     * ($work_time->restrain_hour)
+     *
+     *
+     * @return String //(時)
+     */
+    public function getRestrainHourAttribute()
+    {
+        $time_hour = Method::restrainHour($this->in, $this->out);
+
+
+        return sprintf('%.2f', $time_hour);
+    }
+
+
+
+
+    /**
+     * 休憩時間の表示
+     * ($work_time->break_hour)
+     *
+     *
+     * @return String //(時)
+     */
+    public function getBreakHourAttribute()
+    {
+        return'BreakHour';
+    }
+
+
+
+
+    /**
+     * 労働時間の表示
+     * ($work_time->working_hour)
+     *
+     *
+     * @return String //(時)
+     */
+    public function getWorkingHourAttribute()
+    {
+        return 'Workinghour';
+    }
 
 
 
