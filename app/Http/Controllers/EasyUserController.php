@@ -84,8 +84,11 @@ class EasyUserController extends Controller
         $employees = Employee::where('user_id',$user->id)->get();
 
         // 勤務日の配列
-        $work_dates = [];
-        $work_date = $now->format('Y-m-d');
+        $work_dates = [
+            $now->subDay(2)->format('Y-m-d'),
+            $now->addDay()->format('Y-m-d'),
+            $now->addDay()->format('Y-m-d'),
+        ];
 
         // 勤務時間
         $work_schedules = [
@@ -119,67 +122,19 @@ class EasyUserController extends Controller
 
 
         # 出勤・休憩データの作成
-        foreach ($employees as $e_index => $employee)
+        foreach($work_dates as $work_date)
         {
-            /**
-             * ----------------
-             * 出勤当日の勤務
-             * ----------------
-            */
 
-            # 出勤データの挿入
-            $work_index = $e_index;
-            $work_time = new WorkTime([
-                'employee_id' => $employee->id,
-                'date' => $work_date,
-                'in' => $work_schedules[$work_index][0] === '00:00:00' ? '00:00:00':
-                    Carbon::parse($work_date.' '.$work_schedules[$work_index][0])
-                    ->subSecond(mt_rand(0, 15*60-1)) //’出勤’0～15分’前’のランダムな時間
-                    ->format('Y-m-d H:i:s'),
-
-                'out' => $work_schedules[$work_index][1] === '24:00:00' ? '24:00:00':
-                    Carbon::parse($work_date.' '.$work_schedules[$work_index][1])
-                    ->addSecond(mt_rand(0, 15*60-1)) //’退勤’0～15分’後’のランダムな時間
-                    ->format('Y-m-d H:i:s'),
-
-            ]);
-            $work_time->save();
-
-
-            # 休憩データの挿入
-            $break_index = $e_index;
-            if($break_schedules[$break_index] !== NULL){
-                foreach ($break_schedules[$break_index] as $break_schedule)
-                {
-                    $break_time = new BreakTime([
-                        'work_time_id' => $work_time->id,
-                        'in' =>
-                            Carbon::parse($work_date.' '.$break_schedule[0])
-                            ->subSecond(mt_rand(0, 15*60-1)) //’休憩開始’0～15分’前’のランダムな時間
-                            ->format('Y-m-d H:i:s'),
-
-                        'out' =>
-                            Carbon::parse($work_date.' '.$break_schedule[1])
-                            ->addSecond(mt_rand(0, 15*60-1)) //’休憩終了’0～15分’前’のランダムな時間
-                            ->format('Y-m-d H:i:s'),
-                    ]);
-                    $break_time->save();
-
-                }// end foreach $break_schedules[$break_index]
-            }// end if
-
-
-
-            /**
-             * -----------------------------
-             * 日付を跨いだ勤務時間 (0時以降)
-             * -----------------------------
-            */
-            // 日付を跨いだ勤務時間が存在するとき、データの作成
-            if( array_key_exists($night_index = $e_index+10, $work_schedules) )
+            foreach ($employees as $e_index => $employee)
             {
+                /**
+                 * ----------------
+                 * 出勤当日の勤務
+                 * ----------------
+                */
+
                 # 出勤データの挿入
-                $work_index = $night_index;
+                $work_index = $e_index;
                 $work_time = new WorkTime([
                     'employee_id' => $employee->id,
                     'date' => $work_date,
@@ -198,7 +153,7 @@ class EasyUserController extends Controller
 
 
                 # 休憩データの挿入
-                $break_index = $night_index;
+                $break_index = $e_index;
                 if($break_schedules[$break_index] !== NULL){
                     foreach ($break_schedules[$break_index] as $break_schedule)
                     {
@@ -220,12 +175,63 @@ class EasyUserController extends Controller
                 }// end if
 
 
-            } //end if
+
+                /**
+                 * -----------------------------
+                 * 日付を跨いだ勤務時間 (0時以降)
+                 * -----------------------------
+                */
+                // 日付を跨いだ勤務時間が存在するとき、データの作成
+                if( array_key_exists($night_index = $e_index+10, $work_schedules) )
+                {
+                    # 出勤データの挿入
+                    $work_index = $night_index;
+                    $work_time = new WorkTime([
+                        'employee_id' => $employee->id,
+                        'date' => $work_date,
+                        'in' => $work_schedules[$work_index][0] === '00:00:00' ? '00:00:00':
+                            Carbon::parse($work_date.' '.$work_schedules[$work_index][0])
+                            ->subSecond(mt_rand(0, 15*60-1)) //’出勤’0～15分’前’のランダムな時間
+                            ->format('Y-m-d H:i:s'),
+
+                        'out' => $work_schedules[$work_index][1] === '24:00:00' ? '24:00:00':
+                            Carbon::parse($work_date.' '.$work_schedules[$work_index][1])
+                            ->addSecond(mt_rand(0, 15*60-1)) //’退勤’0～15分’後’のランダムな時間
+                            ->format('Y-m-d H:i:s'),
+
+                    ]);
+                    $work_time->save();
 
 
-        } //end foreach $employees
+                    # 休憩データの挿入
+                    $break_index = $night_index;
+                    if($break_schedules[$break_index] !== NULL){
+                        foreach ($break_schedules[$break_index] as $break_schedule)
+                        {
+                            $break_time = new BreakTime([
+                                'work_time_id' => $work_time->id,
+                                'in' =>
+                                    Carbon::parse($work_date.' '.$break_schedule[0])
+                                    ->subSecond(mt_rand(0, 15*60-1)) //’休憩開始’0～15分’前’のランダムな時間
+                                    ->format('Y-m-d H:i:s'),
+
+                                'out' =>
+                                    Carbon::parse($work_date.' '.$break_schedule[1])
+                                    ->addSecond(mt_rand(0, 15*60-1)) //’休憩終了’0～15分’前’のランダムな時間
+                                    ->format('Y-m-d H:i:s'),
+                            ]);
+                            $break_time->save();
+
+                        }// end foreach $break_schedules[$break_index]
+                    }// end if
 
 
+                } //end if
+
+
+            } //end foreach $employees
+
+        } //end foreach $work_dates
 
         return dd($work_time);
     }

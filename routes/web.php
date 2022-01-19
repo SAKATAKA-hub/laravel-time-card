@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\EasyUserController;
+use App\Http\Controllers\EmployeeListController;
+use App\Http\Controllers\InputWorkRecordController;
+use App\Http\Controllers\WorkRecordListController;
 
 
 /*
@@ -36,22 +39,16 @@ Route::get('time_card', function () {
 ->name('time_card');
 
 
-# 月別勤怠管理表の表示(month_list')
-Route::get('month_list', function () {
-    return view('month_list');
-})
+# 月別勤怠管理表の表示(month_list)
+Route::get('month_list', [WorkRecordListController::class,'month_list'])
 ->name('month_list');
 
-# 日別勤怠管理表の表示(date_list')
-Route::get('date_list', function () {
-    return view('date_list');
-})
+# 日別勤怠管理表の表示(date_list)
+Route::get('date_list', [WorkRecordListController::class,'date_list'])
 ->name('date_list');
 
-# 個人別勤怠管理表の表示(parsonal_list')
-Route::get('parsonal_list', function () {
-    return view('parsonal_list');
-})
+# 個人別勤怠管理表の表示(parsonal_list)
+Route::get('parsonal_list', [WorkRecordListController::class,'parsonal_list'])
 ->name('parsonal_list');
 
 
