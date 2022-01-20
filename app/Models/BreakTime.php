@@ -47,11 +47,13 @@ class BreakTime extends Model
      */
     public function getTextAttribute()
     {
+        // 休憩終了の打刻がされていないときは、"--:--"を表示する
+
         $in = substr($this->in, 0, 5);
-        $out = substr($this->out, 0, 5);
+        $out = isset($this->out) ? substr($this->out, 0, 5) : '--:--';
         $hour = $this->hour;
 
-        return sprintf('%s-%s(%.2f)',$in,$out,$hour);
+        return sprintf('%s - %s(%.2f)',$in,$out,$hour);
     }
 
 
@@ -67,11 +69,29 @@ class BreakTime extends Model
      */
     public function getHourAttribute()
     {
-        $time_hour = Method::breakHour($this->in, $this->out);
+        // 休憩終了の打刻がされていないときは、"0時間"を返す
+
+        $time_hour = isset($this->out) ?
+            Method::breakHour($this->in, $this->out) : 0;
+        ;
+
 
         return sprintf('%.2f', $time_hour);
     }
 
+
+
+    /**
+     * 深夜休憩時間の計算
+     * ($break_time->night_hour)
+     *
+     *
+     * @return String //(時)
+     */
+    public function getNightHourAttribute()
+    {
+        return 0;
+    }
 
 
 

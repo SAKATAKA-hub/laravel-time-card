@@ -37,11 +37,12 @@ class WorkRecordListController extends Controller
 
         # test
         $work_time = WorkTime::find(1);
-        $break_time = breakTime::find(1);
+        $break_time = BreakTime::find(1);
+
+        $work_time->out = Null;
 
 
-        dd( $work_time->restrain_hour);
-
+        dd($work_time->working_hour);
 
 
 

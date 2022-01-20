@@ -51,17 +51,19 @@ class WorkTime extends Model
      */
     public function getTextAttribute()
     {
-        $in = substr($this->in, 0, 5);
-        $out = substr($this->out, 0, 5);
+        // 退勤打刻がされていないときは、"--:--"を表示する
 
-        return sprintf('%s-%s',$in,$out);
+        $in = substr($this->in, 0, 5);
+        $out = isset($this->out) ? substr($this->out, 0, 5) : '--:--';
+
+        return sprintf('%s - %s',$in,$out);
     }
 
 
 
 
     /**
-     * 勤務時間の表示
+     * [一勤務の合計]勤務時間の表示
      * ($work_time->restrain_hour)
      *
      *
@@ -69,7 +71,11 @@ class WorkTime extends Model
      */
     public function getRestrainHourAttribute()
     {
-        $time_hour = Method::restrainHour($this->in, $this->out);
+        // 退勤打刻がされていないときは、"0時間"を返す
+
+        $time_hour = isset($this->out) ?
+            Method::restrainHour($this->in, $this->out) : 0
+        ;
 
 
         return sprintf('%.2f', $time_hour);
@@ -79,7 +85,7 @@ class WorkTime extends Model
 
 
     /**
-     * 休憩時間の表示
+     * [一勤務の合計]休憩時間の表示
      * ($work_time->break_hour)
      *
      *
@@ -87,14 +93,25 @@ class WorkTime extends Model
      */
     public function getBreakHourAttribute()
     {
-        return'BreakHour';
+        # 出勤に紐づく休憩データの取得
+        $break_times = BreakTime::where('work_time_id',$this->id)->get();
+
+        # 休憩の合計時間を計算
+        $time_hour = 0 ;
+        foreach($break_times as $break_time)
+        {
+            $time_hour += (int)$break_time->hour;
+        }
+
+
+        return sprintf('%.2f', $time_hour);
     }
 
 
 
 
     /**
-     * 労働時間の表示
+     * [一勤務の合計]労働時間の表示
      * ($work_time->working_hour)
      *
      *
@@ -102,8 +119,31 @@ class WorkTime extends Model
      */
     public function getWorkingHourAttribute()
     {
-        return 'Workinghour';
+        # [一勤務の合計]勤務時間 - [一勤務の合計]休憩時間
+        // 退勤打刻がされていないときは、"0時間"を返す
+
+        $time_hour = isset($this->out) ?
+            (int)$this->restrain_hour - (int)$this->break_hour : 0
+        ;
+
+
+        return sprintf('%.2f', $time_hour);
     }
+
+
+
+    /**
+     * [一勤務の合計]深夜時間の表示
+     * ($work_time->night_hour)
+     *
+     *
+     * @return String //(時)
+     */
+    public function getNightHourAttribute()
+    {
+        return 'NightHour';
+    }
+
 
 
 
