@@ -56,7 +56,22 @@ class WorkRecordListController extends Controller
     */
     public function date_list()
     {
-        return view('date_list');
+        # ユーザーID
+        $user_id = 1;
+
+        # 日付の指定
+        $today = '2022-01-20';
+
+        # (ユーザーに紐づく)従業員と日付を指定した、勤務データの取得
+        $work_times =
+        WorkTime::employees($user_id)->where('date',$today)
+        ->orderBy('in','asc')->get();
+
+        // dd($work_times[0]->break_times);
+
+
+
+        return view('date_list',compact('work_times'));
     }
 
 

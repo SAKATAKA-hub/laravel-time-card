@@ -6,8 +6,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class DatabaseTest extends TestCase
+use Database\Seeders\WorkRecordStatusSeeder;
+
+class WorkRecordTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * A basic Unit test example.
      *
@@ -15,8 +19,10 @@ class DatabaseTest extends TestCase
      */
     public function test_example()
     {
-        $response = $this->get('/');
 
-        $response->assertStatus(200);
+        $this->seed([
+            WorkRecordStatusSeeder::class,
+        ]);
+
     }
 }

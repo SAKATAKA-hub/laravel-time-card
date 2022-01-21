@@ -28,9 +28,23 @@ class WorkTime extends Model
     |--------------------------------------------------------------------------
     */
 
+    /**
+     * Employeeテーブルとのリレーション
+     */
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
 
 
+    /**
+     * BreakTimeテーブルとのリレーション
+     */
 
+    public function break_times()
+    {
+        return $this->hasMany(BreakTime::class);
+    }
 
 
 

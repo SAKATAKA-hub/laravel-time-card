@@ -66,32 +66,38 @@
                 </tr>
             </thead>
             <tbody>
-                @for ($i = 0; $i < 10; $i++)
+                @foreach ($work_times as $work_time)
                 <tr>
-                    <th scope="row">山田　太郎</th>
-                    <td>00日(月)</td>
-                    <td>08:00-17:00</td>
+                    <th scope="row">{{$work_time->employee->name}}</th>
+                    <td>{{$work_time->date}}</td>
+                    <td>{{$work_time->text}}</td>
                     <td>10:00-11:00(1.00)</td>
-                    <td>9.00</td>
-                    <td>2.00</td>
-                    <td>7.00</td>
-                    <td>0.00</td>
+
+                    <td>{{$work_time->restrain_hour}}</td> <!-- 勤務時間(h) -->
+                    <td>{{$work_time->break_hour}}</td> <!-- 休憩時間(h) -->
+                    <td>{{$work_time->working_hour}}</td> <!-- 労働時間(h) -->
+                    <td>{{$work_time->night_hour}}</td> <!-- 深夜時間(h) -->
+
                     <td><button class="btn btn-warning">修正</button></td>
                     <td><button class="btn btn-danger">削除</button></td>
                 </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>14:00-15:00(1.00)</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                @endfor
+
+                    @foreach ($work_time->break_times as $break_time)
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>{{$break_time->text}}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    @endforeach
+
+                @endforeach
             </tbody>
             <tfoot class="border-secondary">
                 <tr>
