@@ -67,7 +67,7 @@ class Method  extends Model
 
     /**
      * 時間をm分区切りに計算(切り上げる)
-     *　-- 退勤時間の計算 --
+     *　-- 出勤時間の計算 --
      *
      * @param String $His (HH:ii:ss)
      * @return Array ['H','i','s']

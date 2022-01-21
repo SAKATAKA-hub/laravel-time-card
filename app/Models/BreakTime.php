@@ -83,14 +83,61 @@ class BreakTime extends Model
 
     /**
      * 深夜休憩時間の計算
+     * -- WorkTimeモデル getNightBreakHourAttributeメソッド内で利用 --
      * ($break_time->night_hour)
      *
      *
-     * @return String //(時)
+     * @return Int //(時)
      */
     public function getNightHourAttribute()
     {
-        return 0;
+        $time_hour = 0;
+        if( isset($this->out) )
+        {
+
+            #A 出勤時間(in)が、05:00前のとき
+            if( $this->in < '05:00:00')
+            {
+                //A-1 退勤時間(out)が、05:00前のとき
+                if( $this->out <= '05:00:00')
+                {
+                    $in = $this->in; $out = $this->out;
+                }
+                //A-2 退勤時間(out)が、05:00以降のとき
+                else
+                {
+                    $in = $this->in; $out = '05:00:00';
+                }
+
+                //深夜の休憩時間を加算
+                // 休憩が日にちを跨ぐ場合、$m分区切りの端数を切り捨てる。
+                $time_hour +=  $in === "00:00:00" ?
+                    Method::restrainHour($in, $out) : //切り捨て計算
+                    Method::breakHour($in, $out); //切り上げ計算
+
+            }
+
+            #B 退勤時間(out)が、22:00以降のとき
+            if( $this->out > '22:00:00')
+            {
+                //B-1 出勤時間(in)が、22:00前のとき
+                if($this->in < '22:00:00')
+                {
+                    $in = '22:00:00'; $out = $this->out;
+                }
+                //B-2 出勤時間(in)が、22:00以降のとき
+                else {
+                    $in = $this->in; $out = $this->out;
+                }
+
+                //深夜の休憩時間を加算
+                $time_hour +=  Method::breakHour($in, $out);
+
+            }
+
+        }
+
+        return $time_hour;
     }
 
 

@@ -141,8 +141,103 @@ class WorkTime extends Model
      */
     public function getNightHourAttribute()
     {
-        return 'NightHour';
+
+        $time_hour = 0;
+        if( isset($this->out) )
+        {
+
+            #A 出勤時間(in)が、05:00前のとき
+            if( $this->in < '05:00:00')
+            {
+                //A-1 退勤時間(out)が、05:00前のとき
+                if( $this->out <= '05:00:00')
+                {
+                    $in = $this->in; $out = $this->out;
+                }
+                //A-2 退勤時間(out)が、05:00以降のとき
+                else
+                {
+                    $in = $this->in; $out = '05:00:00';
+                }
+
+                // 深夜の勤務時間を加算
+                $time_hour +=  Method::restrainHour($in, $out);
+            }
+
+            #B 退勤時間(out)が、22:00以降のとき
+            if( $this->out > '22:00:00')
+            {
+                //B-1 出勤時間(in)が、22:00前のとき
+                if($this->in < '22:00:00')
+                {
+                    $in = '22:00:00'; $out = $this->out;
+                }
+                //B-2 出勤時間(in)が、22:00以降のとき
+                else {
+                    $in = $this->in; $out = $this->out;
+                }
+
+                // 深夜の勤務時間を加算
+                $time_hour +=  Method::restrainHour($in, $out);
+            }
+
+
+            // 深夜の休憩時間を減算
+            $time_hour -= $this->night_break_hour;
+
+
+        }
+
+
+        return sprintf('%.2f', $time_hour);
+
+
+        /**
+         * ----------------------------------------------------------
+         * 深夜時間の算出解説
+         * ----------------------------------------------------------
+         *
+         * 00:00     05:00               22:00     24:00
+         *  |----------|------------------|---------|
+         *     (深夜)                        (深夜)
+         *
+         * # in < 05:00, out <= 05:00のとき、                 処理A-1
+         * # in < 05:00, 05:00 < out <= 22:00 のとき、        処理A-2
+         * # in < 05:00, out < 22:00のとき、                  処理A-2, B-1
+         * # 05:00 <= in < 22:00, 05:00 < out <= 22:00のとき、処理無し
+         * #  05:00 <= in < 22:00, out > 22:00のとき、        処理B-1
+         * # in >= 22:00, out > 22:00のとき、                 処理B-2
+         *
+         * ----------------------------------------------------------
+         */
     }
+
+
+
+    /**
+     * [一勤務の合計]深夜休憩時間の表示
+     * ($work_time->night_break_hour)
+     * -- getNightHourAttributeメソッド内で利用 --
+     *
+     *
+     * @return Int //(時)
+     */
+    public function getNightBreakHourAttribute()
+    {
+        # 出勤に紐づく休憩データの取得
+        $break_times = BreakTime::where('work_time_id',$this->id)->get();
+
+        # 休憩の合計時間を計算
+        $time_hour = 0 ;
+        foreach($break_times as $break_time)
+        {
+            $time_hour += (int)$break_time->night_hour;
+        }
+
+
+        return $time_hour;
+    }
+
 
 
 
