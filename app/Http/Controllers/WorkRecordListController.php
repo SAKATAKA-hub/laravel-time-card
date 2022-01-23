@@ -15,7 +15,8 @@ class WorkRecordListController extends Controller
     /**
      * 日別勤怠管理表ページの表示(date_list)
      *
-     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\View\View
     */
     public function date_list(Request $request)
     {
@@ -40,12 +41,11 @@ class WorkRecordListController extends Controller
 
         # 集計時間
         $total_times = [
-            'restrain_hour' => $this->groupTotalTime($time_name='restrain_hour', $work_times),
-            'break_hour' => $this->groupTotalTime($time_name='break_hour', $work_times),
-            'working_hour' => $this->groupTotalTime($time_name='working_hour', $work_times),
-            'night_hour' => $this->groupTotalTime($time_name='night_hour', $work_times),
+            'restrain_hour' => Method::groupTotalTime($time_name='restrain_hour', $work_times), //総勤務時間(h)
+            'break_hour' => Method::groupTotalTime($time_name='break_hour', $work_times), //総休憩時間(h)
+            'working_hour' => Method::groupTotalTime($time_name='working_hour', $work_times), //総労働時間(h)
+            'night_hour' => Method::groupTotalTime($time_name='night_hour', $work_times), //総深夜時間(h)
         ];
-
 
 
         return view( 'date_list',compact('date_ob','weeks','work_times','total_times') );
@@ -60,7 +60,8 @@ class WorkRecordListController extends Controller
     /**
      * 月別勤怠管理表ページの表示(month_list)
      *
-     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\View\View
     */
     public function month_list(Request $request)
     {
@@ -95,17 +96,14 @@ class WorkRecordListController extends Controller
 
             // 集計データ
             $employee_total_times = [
-                'restrain_hour' => $this->groupTotalTime($time_name='restrain_hour', $work_times),
-                'break_hour' => $this->groupTotalTime($time_name='break_hour', $work_times),
-                'working_hour' => $this->groupTotalTime($time_name='working_hour', $work_times),
-                'night_hour' => $this->groupTotalTime($time_name='night_hour', $work_times),
+                'restrain_hour' => Method::groupTotalTime($time_name='restrain_hour', $work_times),
+                'break_hour' => Method::groupTotalTime($time_name='break_hour', $work_times),
+                'working_hour' => Method::groupTotalTime($time_name='working_hour', $work_times),
+                'night_hour' => Method::groupTotalTime($time_name='night_hour', $work_times),
             ];
 
             $employees[$i]->total_times = $employee_total_times;
         }
-
-
-
 
 
         # (ユーザーに紐づく)従業員と日付を指定した、勤務データの取得
@@ -118,10 +116,10 @@ class WorkRecordListController extends Controller
 
         # 集計時間
         $total_times = [
-            'restrain_hour' => $this->groupTotalTime($time_name='restrain_hour', $work_times),
-            'break_hour' => $this->groupTotalTime($time_name='break_hour', $work_times),
-            'working_hour' => $this->groupTotalTime($time_name='working_hour', $work_times),
-            'night_hour' => $this->groupTotalTime($time_name='night_hour', $work_times),
+            'restrain_hour' => Method::groupTotalTime($time_name='restrain_hour', $work_times), //総勤務時間(h)
+            'break_hour' => Method::groupTotalTime($time_name='break_hour', $work_times), //総休憩時間(h)
+            'working_hour' => Method::groupTotalTime($time_name='working_hour', $work_times), //総労働時間(h)
+            'night_hour' => Method::groupTotalTime($time_name='night_hour', $work_times), //総深夜時間(h)
         ];
 
 
@@ -138,7 +136,8 @@ class WorkRecordListController extends Controller
     /**
      * 個人別勤怠管理表ページの表示(parsonal_list)
      *
-     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\View\View
     */
     public function parsonal_list(Request $request)
     {
@@ -173,10 +172,10 @@ class WorkRecordListController extends Controller
 
         # 集計時間
         $total_times = [
-            'restrain_hour' => $this->groupTotalTime($time_name='restrain_hour', $work_times),
-            'break_hour' => $this->groupTotalTime($time_name='break_hour', $work_times),
-            'working_hour' => $this->groupTotalTime($time_name='working_hour', $work_times),
-            'night_hour' => $this->groupTotalTime($time_name='night_hour', $work_times),
+            'restrain_hour' => Method::groupTotalTime($time_name='restrain_hour', $work_times), //総勤務時間(h)
+            'break_hour' => Method::groupTotalTime($time_name='break_hour', $work_times), //総休憩時間(h)
+            'working_hour' => Method::groupTotalTime($time_name='working_hour', $work_times), //総労働時間(h)
+            'night_hour' => Method::groupTotalTime($time_name='night_hour', $work_times), //総深夜時間(h)
         ];
 
 
@@ -184,74 +183,6 @@ class WorkRecordListController extends Controller
         return view('parsonal_list',
             compact('date_ob','weeks','employees','employee_id','employee_name','work_times','total_times')
         );
-    }
-
-
-
-
-    /**
-     * 勤怠修正ページの表示(edit_work_record)
-     *
-     *
-    */
-    public function edit_work_record(Request $request)
-    {
-        # ユーザーID
-        $user_id = 1;
-
-        # 日付の指定
-        // 日付指定のリクエストが無ければ、今日の日付
-        $date = empty( $request->date ) ? Carbon::parse('now')->format('Y-m-d') : $request->date;
-
-
-        # 日付オブジェクト・曜日配列
-        $date_ob = Carbon::parse($date);
-        $weeks =['(日)','(月)','(火)','(水)','(木)','(金)','(土)',];
-
-
-        # (ユーザーに紐づく)従業員と日付を指定した、勤務データの取得
-        $work_times =
-        WorkTime::employees($user_id)->where('date',$date)
-        ->orderBy('in','asc')->get();
-
-
-        # 集計時間
-        $total_times = [
-            'restrain_hour' => $this->groupTotalTime($time_name='restrain_hour', $work_times),
-            'break_hour' => $this->groupTotalTime($time_name='break_hour', $work_times),
-            'working_hour' => $this->groupTotalTime($time_name='working_hour', $work_times),
-            'night_hour' => $this->groupTotalTime($time_name='night_hour', $work_times),
-        ];
-
-
-
-        return view( 'edit_work_record',compact('date_ob','weeks','work_times','total_times') );
-    }
-
-
-
-
-
-    /**
-     * ==========================================================
-     *  メソッド
-     * ==========================================================
-    */
-
-    /**
-     * 勤怠リストの集計時間を計算するメソッド
-    */
-    public function groupTotalTime($time_name, $work_times)
-    {
-        $time_hour = 0;
-
-        foreach ($work_times as $work_time)
-        {
-            $time_hour += $work_time[$time_name];
-        }
-
-
-        return sprintf('%.2f', $time_hour);
     }
 
 

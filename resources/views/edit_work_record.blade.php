@@ -83,7 +83,6 @@
             <thead class="border-secondary">
                 <tr>
                     <th scope="col">氏 名</th>
-                    <th scope="col">日 付</th>
                     <th scope="col">就 業</th>
                     <th scope="col">休 憩</th>
                     <th scope="col">勤務時間(h)</th>
@@ -96,10 +95,9 @@
             </thead>
             <tbody>
 
-                @forelse ($work_times as $work_time)
+                @forelse ($work_times as $w_index => $work_time)
                 <tr>
                     <th scope="row">{{$work_time->employee->name}}</th>
-                    <td>{{$work_time->date_text}}</td>
                     <td>{{$work_time->text}}</td>
                     <td></td>
 
@@ -108,13 +106,20 @@
                     <td>{{$work_time->working_hour}}</td> <!-- 労働時間(h) -->
                     <td>{{$work_time->night_hour}}</td> <!-- 深夜時間(h) -->
 
-                    <td><button class="btn btn-warning">修正</button></td>
-                    <td><button class="btn btn-danger">削除</button></td>
+                    <td> <!-- 修正モーダルボタン('updateForm'.$w_index) -->
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#{{'updateForm'.$w_index}}">
+                            修正
+                        </button>
+                    </td>
+                    <td> <!-- 削除モーダルボタン('destroyForm'.$w_index) -->
+                        <button type="button"class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#{{'destroyForm'.$w_index}}">
+                            削除
+                        </button>
+                    </td>
                 </tr>
 
                     @foreach ($work_time->break_times as $break_time)
                     <tr>
-                        <td></td>
                         <td></td>
                         <td></td>
                         <td>{{$break_time->text}}</td>
@@ -130,7 +135,7 @@
                 <!-- 勤務記録が存在しないとき -->
                 @empty
                     <tr>
-                        <th colspan="10" class="text-secondary">
+                        <th colspan="9" class="text-secondary">
                             勤務記録がありません
                         </th>
                     </tr>
@@ -139,7 +144,6 @@
             </tbody>
             <tfoot class="border-secondary">
                 <tr>
-                    <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col"></th>
@@ -157,68 +161,137 @@
     </div>
 
 
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-        修正ボタン
-    </button>
-
-    <!-- Modal -->
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">0000年00月00日 山田　太郎</h5>
-                    {{-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> --}}
-                </div>
 
 
+    <!--
+    -----------------------------------------
+        Modal
+    -----------------------------------------
+    -->
+
+    @foreach ($work_times as $w_index => $work_time)
+
+        <!--  勤怠修正モーダル  -->
+        <div class="modal fade" id="{{'updateForm'.$w_index}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="Post" action="{{route('update_work_record')}}">
+                        @method('PATCH')
+                        @csrf
+                        <input type="hidden" name="date" value="{{$date_ob->format('Y-m-d')}}">
+                        <input type="hidden" name="work_time_id" value="{{$work_time->id}}">
 
 
-                <div class="modal-body">
-
-                    <table class="table bg-white">
-                        <tr>
-                            <th>出勤<input type="time" name="" value="08:00"></th>
-                            <th>退勤 <input type="time" name="" value="08:00"></th>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>休憩開始 <input type="time" name="" value="08:00"></td>
-                            <td>休憩終了 <input type="time" name="" value="08:00"></td>
-                            <td><button class="btn btn-danger">削除</button></td>
-                        </tr>
-                        <tr>
-                            <td>休憩開始 <input type="time" name="" value="08:00"></td>
-                            <td>休憩終了 <input type="time" name="" value="08:00"></td>
-                            <td><button class="btn btn-danger">削除</button></td>
-                        </tr>
-                    </table>
-
-                    <div style="height:6rem;">
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            エラー：エラーメッセージ！
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <!-- modal-header -->
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">
+                                {{$date_ob->format('Y年m月d日').$weeks[$date_ob->format('w')]}} {{$work_time->employee->name}}
+                            </h5>
                         </div>
-                    </div>
-
-                </div>
 
 
 
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">戻る</button>
+                        <!-- modal-body -->
+                        <div class="modal-body">
+                            <table class="table bg-white">
+
+                                <!--出退勤時間-->
+                                <tr>
+                                    <th>出勤<input type="time" name="work_time_in" value="{{substr($work_time->in,0,5)}}"></th>
+                                    <th>退勤 <input type="time" name="work_time_out" value="{{substr($work_time->out,0,5)}}"></th>
+                                    <td></td>
+                                </tr>
+
+                                <!--休憩時間-->
+                                @foreach ($work_time->break_times as $break_time)
+                                    <tr>
+                                        <td>休憩開始 <input type="time" name="break_time_in[]" value="{{substr($break_time->in,0,5)}}"></td>
+                                        <td>休憩終了 <input type="time" name="break_time_out[]" value="{{substr($break_time->out,0,5)}}"></td>
+                                        <td>
+                                            <form method="Post" action="{{route('destroy_break_record')}}">
+                                                @method('DELETE')
+                                                @csrf
+                                                <input type="hidden" name="date" value="{{$date_ob->format('Y-m-d')}}">
+                                                <input type="hidden" name="break_time_id" value="{{$break_time->id}}">
+                                                <button type="submit" class="btn btn-danger">削除</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </table>
+
+
+                            <div style="height:6rem;">
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    エラー：エラーメッセージ！
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                        <!-- modal-footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+
+
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
+
+        <!--  勤怠削除モーダル  -->
+        <div class="modal fade" id="{{'destroyForm'.$w_index}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="Post" action="{{route('destroy_work_record')}}">
+                        @method('DELETE')
+                        @csrf
+                        <input type="hidden" name="date" value="{{$date_ob->format('Y-m-d')}}">
+                        <input type="hidden" name="work_time_id" value="{{$work_time->id}}">
+
+
+                        <!-- modal-header -->
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">
+                                {{$date_ob->format('Y年m月d日').$weeks[$date_ob->format('w')]}} {{$work_time->employee->name}}
+                            </h5>
+                        </div>
+
+
+                        <!-- modal-body -->
+                        <div class="modal-body">
+                            ”{{$work_time->text}}”の勤務記録を削除します。よろしいですか？
+                        </div>
+
+                        <!-- modal-footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+                            <button type="submit" class="btn btn-danger">削除</button>
+                        </div>
+
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    @endforeach
 
 
 
 
 
 
-    <!-- 日付変更モーダルボタン -->
+
+
+
+    <!-- 日付変更モーダル -->
     <div class="modal fade" id="ChangeDateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="ChangeDateModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

@@ -126,7 +126,7 @@
                 <!-- 勤務記録が存在しないとき -->
                 @empty
                     <tr>
-                        <th colspan="10" class="text-secondary">
+                        <th colspan="8" class="text-secondary">
                             勤務記録がありません
                         </th>
                     </tr>

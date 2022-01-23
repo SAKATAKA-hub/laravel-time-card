@@ -83,7 +83,6 @@
             <thead class="border-secondary">
                 <tr>
                     <th scope="col">氏 名</th>
-                    <th scope="col">日 付</th>
                     <th scope="col">就 業</th>
                     <th scope="col">休 憩</th>
                     <th scope="col">勤務時間(h)</th>
@@ -97,7 +96,6 @@
                 @forelse ($work_times as $work_time)
                 <tr>
                     <th scope="row">{{$work_time->employee->name}}</th>
-                    <td>{{$work_time->date_text}}</td>
                     <td>{{$work_time->text}}</td>
                     <td></td>
 
@@ -111,7 +109,6 @@
                     <tr>
                         <td></td>
                         <td></td>
-                        <td></td>
                         <td>{{$break_time->text}}</td>
                         <td></td>
                         <td></td>
@@ -123,7 +120,7 @@
                 <!-- 勤務記録が存在しないとき -->
                 @empty
                     <tr>
-                        <th colspan="10" class="text-secondary">
+                        <th colspan="7" class="text-secondary">
                             勤務記録がありません
                         </th>
                     </tr>
@@ -132,7 +129,6 @@
             </tbody>
             <tfoot class="border-secondary">
                 <tr>
-                    <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col"></th>
