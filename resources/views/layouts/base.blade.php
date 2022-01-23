@@ -128,14 +128,14 @@
 
 
             <!-- パンくずリスト -->
-            <div class="mt-2 ms-3">
+            <div class="mt-2">
                 <a href=""><i class="bi bi-house-fill"></i>ホーム</a>
                 <div class="d-inline-block">@yield('breadcrumb')</div>
             </div>
 
 
             <!--　見出し　-->
-            <h2 class="m-3 fw-bold">@yield('heading')</h2>
+            <h2 class="mt-3 mb-3 fw-bold">@yield('heading')</h2>
 
 
             <!-- メインコンテンツ -->

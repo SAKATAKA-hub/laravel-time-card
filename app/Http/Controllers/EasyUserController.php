@@ -162,12 +162,13 @@ class EasyUserController extends Controller
                             'work_time_id' => $work_time->id,
                             'in' =>
                                 Carbon::parse($work_date.' '.$break_schedule[0])
-                                ->subSecond(mt_rand(0, 15*60-1)) //’休憩開始’0～15分’前’のランダムな時間
+                                ->addSecond(mt_rand(0, 5*60-1)) //’休憩開始’0～5分’後’のランダムな時間
                                 ->format('Y-m-d H:i:s'),
+
 
                             'out' =>
                                 Carbon::parse($work_date.' '.$break_schedule[1])
-                                ->addSecond(mt_rand(0, 15*60-1)) //’休憩終了’0～15分’前’のランダムな時間
+                                ->subSecond(mt_rand(0, 5*60-1)) //’休憩終了’0～5分’前’のランダムな時間
                                 ->format('Y-m-d H:i:s'),
                         ]);
                         $break_time->save();
@@ -213,12 +214,13 @@ class EasyUserController extends Controller
                                 'work_time_id' => $work_time->id,
                                 'in' =>
                                     Carbon::parse($work_date.' '.$break_schedule[0])
-                                    ->subSecond(mt_rand(0, 15*60-1)) //’休憩開始’0～15分’前’のランダムな時間
+                                    ->addSecond(mt_rand(0, 5*60-1)) //’休憩開始’0～5分’後’のランダムな時間
                                     ->format('Y-m-d H:i:s'),
+
 
                                 'out' =>
                                     Carbon::parse($work_date.' '.$break_schedule[1])
-                                    ->addSecond(mt_rand(0, 15*60-1)) //’休憩終了’0～15分’前’のランダムな時間
+                                    ->subSecond(mt_rand(0, 5*60-1)) //’休憩終了’0～5分’前’のランダムな時間
                                     ->format('Y-m-d H:i:s'),
                             ]);
                             $break_time->save();

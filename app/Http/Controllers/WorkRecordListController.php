@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\WorkTime;
 use App\Models\BreakTime;
+use App\Models\Employee;
 use Carbon\Carbon;
 
 
@@ -12,79 +13,246 @@ class WorkRecordListController extends Controller
 {
 
     /**
-     * 月別勤怠管理表の表示(month_list)
+     * 日別勤怠管理表ページの表示(date_list)
      *
      *
     */
-    public function month_list()
+    public function date_list(Request $request)
     {
         # ユーザーID
         $user_id = 1;
 
         # 日付の指定
-        // $today = Carbon::parse('now')->format('Y-m-d');
-        $today = '2022-01-19';
+        // 日付指定のリクエストが無ければ、今日の日付
+        $date = empty( $request->date ) ? Carbon::parse('now')->format('Y-m-d') : $request->date;
+
+
+        # 日付オブジェクト・曜日配列
+        $date_ob = Carbon::parse($date);
+        $weeks =['(日)','(月)','(火)','(水)','(木)','(金)','(土)',];
+
 
         # (ユーザーに紐づく)従業員と日付を指定した、勤務データの取得
         $work_times =
-        WorkTime::employees($user_id)->where('date',$today)->get();
-
-
-
-
-
-
-
-        # test
-        $work_time = WorkTime::find(6);
-        $break_time = BreakTime::find(7);
-
-        dd($work_time->night_hour);
-
-
-
-        return view('month_list');
-    }
-
-
-
-
-    /**
-     * 日別勤怠管理表の表示(date_list)
-     *
-     *
-    */
-    public function date_list()
-    {
-        # ユーザーID
-        $user_id = 1;
-
-        # 日付の指定
-        $today = '2022-01-20';
-
-        # (ユーザーに紐づく)従業員と日付を指定した、勤務データの取得
-        $work_times =
-        WorkTime::employees($user_id)->where('date',$today)
+        WorkTime::employees($user_id)->where('date',$date)
         ->orderBy('in','asc')->get();
 
-        // dd($work_times[0]->break_times);
+
+        # 集計時間
+        $total_times = [
+            'restrain_hour' => $this->groupTotalTime($time_name='restrain_hour', $work_times),
+            'break_hour' => $this->groupTotalTime($time_name='break_hour', $work_times),
+            'working_hour' => $this->groupTotalTime($time_name='working_hour', $work_times),
+            'night_hour' => $this->groupTotalTime($time_name='night_hour', $work_times),
+        ];
 
 
 
-        return view('date_list',compact('work_times'));
+        return view( 'date_list',compact('date_ob','weeks','work_times','total_times') );
+    }
+
+
+
+
+
+
+
+    /**
+     * 月別勤怠管理表ページの表示(month_list)
+     *
+     *
+    */
+    public function month_list(Request $request)
+    {
+        # ユーザーID
+        $user_id = 1;
+
+
+        # 日付の指定
+        // 日付のリクエストが無ければ、今日の日付
+        $date = empty( $request->month ) ? Carbon::parse('now')->format('Y-m-01') : $request->month.'-01';
+
+        # 日付オブジェクト・曜日配列
+        $date_ob = Carbon::parse($date);
+        $weeks =['(日)','(月)','(火)','(水)','(木)','(金)','(土)',];
+
+
+        # 全従業員情報
+        $employees = Employee::where('user_id',$user_id)->get();
+
+
+        # 各従業員ごとの月の集計データの取得
+        for ($i=0; $i < $employees->count(); $i++)
+        {
+
+            $employee_id = $employees[$i]->id;
+
+            // 勤務データ
+            $work_times =
+            WorkTime::where('employee_id',$employee_id)
+            ->where('date','>=',$date)->where('date','<',$date_ob->copy()->addMonth()->format('Y-m-01'))
+            ->orderBy('date','asc')->orderBy('in','asc')->get();
+
+            // 集計データ
+            $employee_total_times = [
+                'restrain_hour' => $this->groupTotalTime($time_name='restrain_hour', $work_times),
+                'break_hour' => $this->groupTotalTime($time_name='break_hour', $work_times),
+                'working_hour' => $this->groupTotalTime($time_name='working_hour', $work_times),
+                'night_hour' => $this->groupTotalTime($time_name='night_hour', $work_times),
+            ];
+
+            $employees[$i]->total_times = $employee_total_times;
+        }
+
+
+
+
+
+        # (ユーザーに紐づく)従業員と日付を指定した、勤務データの取得
+        $work_times =
+        WorkTime::employees($user_id)
+        // WorkTime::where('employee_id',$employee_id)
+        ->where('date','>=',$date)->where('date','<',$date_ob->copy()->addMonth()->format('Y-m-01'))
+        ->orderBy('date','asc')->orderBy('in','asc')->get();
+
+
+        # 集計時間
+        $total_times = [
+            'restrain_hour' => $this->groupTotalTime($time_name='restrain_hour', $work_times),
+            'break_hour' => $this->groupTotalTime($time_name='break_hour', $work_times),
+            'working_hour' => $this->groupTotalTime($time_name='working_hour', $work_times),
+            'night_hour' => $this->groupTotalTime($time_name='night_hour', $work_times),
+        ];
+
+
+
+        return view('month_list',
+            compact('date_ob','weeks','employees','work_times','total_times')
+        );
+    }
+
+
+
+
+
+    /**
+     * 個人別勤怠管理表ページの表示(parsonal_list)
+     *
+     *
+    */
+    public function parsonal_list(Request $request)
+    {
+        # ユーザーID
+        $user_id = 1;
+
+        # 日付の指定
+        // 日付のリクエストが無ければ、今日の日付
+        $date = empty( $request->month ) ? Carbon::parse('now')->format('Y-m-01') : $request->month.'-01';
+
+        # 日付オブジェクト・曜日配列
+        $date_ob = Carbon::parse($date);
+        $weeks =['(日)','(月)','(火)','(水)','(木)','(金)','(土)',];
+
+
+        # 全従業員情報
+        $employees = Employee::where('user_id',$user_id)->get();
+
+        # 表示中従業員
+        // 従業員のリクエストが無ければ、先頭の従業員
+        $employee_id = empty( $request->employee_id ) ? $employees[0]->id : (int)$request->employee_id ;
+        $employee_name = Employee::find($employee_id)->name;
+
+
+        # (ユーザーに紐づく)従業員と日付を指定した、勤務データの取得
+        $work_times =
+        // WorkTime::employees($user_id)
+        WorkTime::where('employee_id',$employee_id)
+        ->where('date','>=',$date)->where('date','<',$date_ob->copy()->addMonth()->format('Y-m-01'))
+        ->orderBy('date','asc')->orderBy('in','asc')->get();
+
+
+        # 集計時間
+        $total_times = [
+            'restrain_hour' => $this->groupTotalTime($time_name='restrain_hour', $work_times),
+            'break_hour' => $this->groupTotalTime($time_name='break_hour', $work_times),
+            'working_hour' => $this->groupTotalTime($time_name='working_hour', $work_times),
+            'night_hour' => $this->groupTotalTime($time_name='night_hour', $work_times),
+        ];
+
+
+
+        return view('parsonal_list',
+            compact('date_ob','weeks','employees','employee_id','employee_name','work_times','total_times')
+        );
     }
 
 
 
 
     /**
-     * 個人別勤怠管理表の表示(parsonal_list)
+     * 勤怠修正ページの表示(edit_work_record)
      *
      *
     */
-    public function parsonal_list()
+    public function edit_work_record(Request $request)
     {
-        return view('parsonal_list');
+        # ユーザーID
+        $user_id = 1;
+
+        # 日付の指定
+        // 日付指定のリクエストが無ければ、今日の日付
+        $date = empty( $request->date ) ? Carbon::parse('now')->format('Y-m-d') : $request->date;
+
+
+        # 日付オブジェクト・曜日配列
+        $date_ob = Carbon::parse($date);
+        $weeks =['(日)','(月)','(火)','(水)','(木)','(金)','(土)',];
+
+
+        # (ユーザーに紐づく)従業員と日付を指定した、勤務データの取得
+        $work_times =
+        WorkTime::employees($user_id)->where('date',$date)
+        ->orderBy('in','asc')->get();
+
+
+        # 集計時間
+        $total_times = [
+            'restrain_hour' => $this->groupTotalTime($time_name='restrain_hour', $work_times),
+            'break_hour' => $this->groupTotalTime($time_name='break_hour', $work_times),
+            'working_hour' => $this->groupTotalTime($time_name='working_hour', $work_times),
+            'night_hour' => $this->groupTotalTime($time_name='night_hour', $work_times),
+        ];
+
+
+
+        return view( 'edit_work_record',compact('date_ob','weeks','work_times','total_times') );
     }
+
+
+
+
+
+    /**
+     * ==========================================================
+     *  メソッド
+     * ==========================================================
+    */
+
+    /**
+     * 勤怠リストの集計時間を計算するメソッド
+    */
+    public function groupTotalTime($time_name, $work_times)
+    {
+        $time_hour = 0;
+
+        foreach ($work_times as $work_time)
+        {
+            $time_hour += $work_time[$time_name];
+        }
+
+
+        return sprintf('%.2f', $time_hour);
+    }
+
 
 }

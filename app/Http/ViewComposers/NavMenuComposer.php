@@ -21,18 +21,18 @@ class NavMenuComposer
                 'aria-current' => '',
             ],
 
-            'month_list' =>
-            [
-                'href' => asset('month_list'),
-                'text' => '月別勤怠一覧表',
-                'activ_class' => '',
-                'aria-current' => '',
-            ],
-
             'date_list' =>
             [
                 'href' => asset('date_list'),
                 'text' => '日別勤怠管理表',
+                'activ_class' => '',
+                'aria-current' => '',
+            ],
+
+            'month_list' =>
+            [
+                'href' => asset('month_list'),
+                'text' => '月別勤怠管理表',
                 'activ_class' => '',
                 'aria-current' => '',
             ],
@@ -45,9 +45,9 @@ class NavMenuComposer
                 'aria-current' => '',
             ],
 
-            'edit_list' =>
+            'edit_work_record' =>
             [
-                'href' => '',
+                'href' => asset('edit_work_record'),
                 'text' => '勤怠修正',
                 'activ_class' => '',
                 'aria-current' => '',

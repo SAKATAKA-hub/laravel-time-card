@@ -3,6 +3,14 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Employee;
+use App\Models\WorkTime;
+use App\Models\BreakTime;
+use Carbon\Carbon;
+use Faker\Factory;
+
+
 
 class WorkRecordStatusSeeder extends Seeder
 {

@@ -2,7 +2,7 @@
 
 {{-- ページタイトル --}}
 @php
-    $page_title = "日別勤怠一覧";
+    $page_title = "勤怠修正";
 @endphp
 @section('title',$page_title)
 
@@ -90,6 +90,8 @@
                     <th scope="col">休憩時間(h)</th>
                     <th scope="col">労働時間(h)</th>
                     <th scope="col">深夜時間(h)</th>
+                    <th></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -105,6 +107,9 @@
                     <td>{{$work_time->break_hour}}</td> <!-- 休憩時間(h) -->
                     <td>{{$work_time->working_hour}}</td> <!-- 労働時間(h) -->
                     <td>{{$work_time->night_hour}}</td> <!-- 深夜時間(h) -->
+
+                    <td><button class="btn btn-warning">修正</button></td>
+                    <td><button class="btn btn-danger">削除</button></td>
                 </tr>
 
                     @foreach ($work_time->break_times as $break_time)
@@ -113,6 +118,8 @@
                         <td></td>
                         <td></td>
                         <td>{{$break_time->text}}</td>
+                        <td></td>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -140,6 +147,8 @@
                     <th scope="col">{{$total_times['break_hour']}}</th> <!-- 総休憩時間(h) -->
                     <th scope="col">{{$total_times['working_hour']}}</th> <!-- 総労働時間(h) -->
                     <th scope="col">{{$total_times['night_hour']}}</th> <!-- 総深夜時間(h) -->
+                    <th></th>
+                    <th></th>
                 </tr>
             </tfoot>
 
@@ -148,9 +157,68 @@
     </div>
 
 
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+        修正ボタン
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">0000年00月00日 山田　太郎</h5>
+                    {{-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> --}}
+                </div>
 
 
-    <!-- 日付変更モーダル -->
+
+
+                <div class="modal-body">
+
+                    <table class="table bg-white">
+                        <tr>
+                            <th>出勤<input type="time" name="" value="08:00"></th>
+                            <th>退勤 <input type="time" name="" value="08:00"></th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>休憩開始 <input type="time" name="" value="08:00"></td>
+                            <td>休憩終了 <input type="time" name="" value="08:00"></td>
+                            <td><button class="btn btn-danger">削除</button></td>
+                        </tr>
+                        <tr>
+                            <td>休憩開始 <input type="time" name="" value="08:00"></td>
+                            <td>休憩終了 <input type="time" name="" value="08:00"></td>
+                            <td><button class="btn btn-danger">削除</button></td>
+                        </tr>
+                    </table>
+
+                    <div style="height:6rem;">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            エラー：エラーメッセージ！
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">戻る</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <!-- 日付変更モーダルボタン -->
     <div class="modal fade" id="ChangeDateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="ChangeDateModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

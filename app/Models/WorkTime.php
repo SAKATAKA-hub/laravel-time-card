@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class WorkTime extends Model
 {
@@ -76,6 +77,25 @@ class WorkTime extends Model
 
 
 
+
+    /**
+     * 勤務日のテキスト表示
+     * ($work_time->date_text)
+     *
+     *
+     * @return String //(00:00-00:00)
+     */
+    public function getDateTextAttribute()
+    {
+        $weeks =['(日)','(月)','(火)','(水)','(木)','(金)','(土)',];
+
+        $date = Carbon::parse($this->date);
+
+
+        return $date->format('d日').$weeks[$date->format('w')];
+    }
+
+
     /**
      * [一勤務の合計]勤務時間の表示
      * ($work_time->restrain_hour)
@@ -114,8 +134,9 @@ class WorkTime extends Model
         $time_hour = 0 ;
         foreach($break_times as $break_time)
         {
-            $time_hour += (int)$break_time->hour;
+            $time_hour += (float)$break_time->hour;
         }
+
 
 
         return sprintf('%.2f', $time_hour);
@@ -137,13 +158,12 @@ class WorkTime extends Model
         // 退勤打刻がされていないときは、"0時間"を返す
 
         $time_hour = isset($this->out) ?
-            (int)$this->restrain_hour - (int)$this->break_hour : 0
+            (float)$this->restrain_hour - (float)$this->break_hour : 0
         ;
 
 
         return sprintf('%.2f', $time_hour);
     }
-
 
 
     /**
@@ -157,6 +177,7 @@ class WorkTime extends Model
     {
 
         $time_hour = 0;
+
         if( isset($this->out) )
         {
 
@@ -245,7 +266,7 @@ class WorkTime extends Model
         $time_hour = 0 ;
         foreach($break_times as $break_time)
         {
-            $time_hour += (int)$break_time->night_hour;
+            $time_hour += (float)$break_time->night_hour;
         }
 
 
