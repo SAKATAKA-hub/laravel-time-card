@@ -10,10 +10,8 @@
     <!-- Title meta tags -->
         <title>@yield('title')</title>
 
-
     <!-- favicon -->
         <link rel="icon" href="{{asset('svg/logo.svg')}}">
-
 
     <!-- Styel link tags -->
         <link href="{{ asset('/css/app.css') }}" rel="stylesheet">
@@ -143,6 +141,7 @@
 
 
 
+
         </div>
 
 
@@ -164,7 +163,9 @@
 
     <!-- Script tags -->
         <script src="{{ asset('/js/app.js') }}"></script>
-
         @yield('script')
+
+
+
 </body>
 </html>

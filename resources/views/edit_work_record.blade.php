@@ -79,7 +79,8 @@
     <!-- TableContainer -->
     <div class="table_container mb-5">
 
-        <table class="table bg-white text-center" style="width: 900px;">
+        <!--ホバーテーブル(table-hover)-->
+        <table class="table table-hover bg-white text-center" style="width: 900px;">
             <thead class="border-secondary">
                 <tr>
                     <th scope="col">氏 名</th>
@@ -96,7 +97,7 @@
             <tbody>
 
                 @forelse ($work_times as $w_index => $work_time)
-                <tr>
+                <tr  data-bs-toggle="modal" data-bs-target="#{{'updateForm'.$w_index}}" style="cursor: pointer">
                     <th scope="row">{{$work_time->employee->name}}</th>
                     <td>{{$work_time->text}}</td>
                     <td></td>
@@ -159,8 +160,6 @@
         </table>
 
     </div>
-
-
 
 
     <!--
@@ -236,7 +235,7 @@
                         <!-- modal-footer -->
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
-                            <button type="submit" class="btn btn-primary">保存</button>
+                            <button type="submit" class="btn btn-primary">更新</button>
                         </div>
 
 

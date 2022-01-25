@@ -15,7 +15,7 @@ class RouteTest extends TestCase
      */
     public function test_create_easy_user()
     {
-        $response = $this->get('create_easy_user');
+        $response = $this->get('/');
         $response->assertStatus(200);
     }
 }

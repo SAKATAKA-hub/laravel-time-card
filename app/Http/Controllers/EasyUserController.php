@@ -13,11 +13,35 @@ use App\Models\BreakTime;
 use Carbon\Carbon;
 use Faker\Factory;
 
+use Database\Seeders\WorkRecordStatusSeeder;
+
+
 
 class EasyUserController extends Controller
 {
     public function create_easy_user()
     {
+
+        # シーダーの利用
+        $user = WorkRecordStatusSeeder::run();
+
+
+        # 作成データの加工
+        $now = Carbon::parse('now');
+        $email = $now->format('YmdHis').'@mail.co.jp';
+
+        $user->update([
+            'name' => '簡単ログイン登録',
+            'email' => $email,
+            'easy_user' => 1,
+        ]);
+
+
+        dd($user);
+
+
+
+
         /**
          * 簡単ログインユーザの新規作成と関連データの作成
          *
@@ -34,7 +58,7 @@ class EasyUserController extends Controller
 
         /**
          * =================================================
-         * 1.簡単ログインユーザの新規作成
+         * 1.ユーザの新規作成
          * =================================================
         */
 
@@ -48,7 +72,6 @@ class EasyUserController extends Controller
             'easy_user' => 1,
         ]);
         $user->save();
-
 
 
 

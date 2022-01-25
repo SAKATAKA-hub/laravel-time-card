@@ -8,6 +8,7 @@ use App\Http\Controllers\EmployeeListController;
 use App\Http\Controllers\InputWorkRecordController;
 use App\Http\Controllers\WorkRecordListController;
 
+use App\Http\Controllers\TestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +33,27 @@ Route::get('create_easy_user',[EasyUserController::class,'create_easy_user'])
 Route::get('base', function () {
     return view('layouts.base');
 });
+
+
+# Vue.js表示
+Route::get('vuejs', function () {
+    return view('test.vuejs');
+});
+
+
+/*
+ |----------------------------------------
+ | フォームバリデーションテスト
+ |---------------------------------------- |
+*/
+Route::get('test/form', [TestController::class,'form_index'])
+->name('test/form');
+
+Route::post('test/form_post', [TestController::class,'form_post'])
+->name('test/form_post');
+
+Route::post('test/ajax_form_post', [TestController::class,'ajax_form_post'])
+->name('test/ajax_form_post');
 
 
 
