@@ -49,6 +49,10 @@ Route::get('vuejs', function () {
 Route::get('test/form', [TestController::class,'form_index'])
 ->name('test/form');
 
+Route::post('test/form_json', [TestController::class,'form_json'])
+->name('test/form_json');
+
+
 Route::post('test/form_post', [TestController::class,'form_post'])
 ->name('test/form_post');
 

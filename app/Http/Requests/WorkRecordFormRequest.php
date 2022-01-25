@@ -47,14 +47,8 @@ class WorkRecordFormRequest extends FormRequest
     public function rules()
     {
 
-        // dd($this->in);
-
-
         # バリデーションルール
         $rules = [
-            // 'in' => ['required',],
-            // 'out' => 'required',
-
             'vali_in' => ['required','lt:'.$this->vali_out],
             'vali_out' => 'required',
 
@@ -73,14 +67,9 @@ class WorkRecordFormRequest extends FormRequest
     public function messages()
     {
         return [
-            'in.required' => '出勤時間は入力必須です。',
-            'in.lt' => '出勤時間は退勤時間より後の時間では入力できません。',
-            'out.required' => '退勤時間は入力必須です。',
-
             'vali_in.required' => '出勤時間は入力必須です。',
             'vali_in.lt' => '出勤時間は退勤時間より後の時間では入力できません。',
             'vali_out.required' => '退勤時間は入力必須です。',
-
         ];
     }
 
