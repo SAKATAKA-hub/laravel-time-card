@@ -25,6 +25,14 @@
 {{-- styleタグ --}}
 @section('style')
 
+    <!-- token -->
+    <meta name="token" content="{{ csrf_token() }}">
+    <!-- route -->
+    <meta name="route_edit_work_record_json" content="{{route('edit_work_record_json')}}">
+    <!-- param -->
+    <meta name="user_id" content="{{$user_id}}">
+    <meta name="date" content="{{$date}}">
+
 
 @endsection
 
@@ -38,6 +46,10 @@
 {{-- scriptタグ --}}
 @section('script')
 
+    <!-- Vue.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <!-- Vuejs.js -->
+    @include('edit_work_record.vuejs')
 
 @endsection
 
@@ -46,7 +58,6 @@
 
 {{-- メインコンテンツ --}}
 @section('main_content')
-
 
 
     <!-- HeadingContainer -->
@@ -76,11 +87,67 @@
 
 
 
+    <!-- テストコンテナー -->
+    <div v-show="form_test" class="mb-3 p-3 bg-white">
+        <h3 class="border-bottom mb-3">JSONテスト(@{{form_test}})</h3>
+
+        <ul>
+            <li><form method="POST" action="{{asset('edit_work_record_json')}}">
+                @csrf
+                <input type="hidden" name="user_id" value="{{$user_id}}">
+                <input type="hidden" name="date" value="{{$date}}">
+
+                <p class="d-inline" style="color:red;">勤怠修正ページのJSONデータ</p>
+                <button type="submit">実行</button>
+
+            </form> </li>
+        </ul>
+    </div>
+
+
+    <!-- 編集モーダル -->
+    <div v-show="form_test" class="mb-3 p-3 bg-white">
+        <h3 class="border-bottom mb-3">編集モーダル</h3>
+        <table class="table bg-white" style="max-width: 900px;">
+            @php
+                $work_time = $work_times[2];
+            @endphp
+
+            <!--出退勤時間-->
+            <tr>
+                <th>出勤<input type="time" v-model="editing_work_time.input_in"></th>
+                <th>退勤 <input type="time" v-model="editing_work_time.input_out"></th>
+                <td></td>
+            </tr>
+
+            <!--休憩時間-->
+            <!-- v-for break_times -->
+            <tr v-for="(break_time, b_index) in editing_work_time.break_times">
+                    <td>休憩開始 <input type="time" name="break_time_in[]" v-model="break_time.input_in"></td>
+                    <td>休憩終了 <input type="time" name="break_time_out[]" v-model="break_time.input_out"></td>
+                    <td>
+                        <form method="Post" action="{{route('destroy_break_record')}}">
+                            @method('DELETE')
+                            @csrf
+                            <input type="hidden" name="date" value="{{$date_ob->format('Y-m-d')}}">
+                            <input type="hidden" name="break_time_id" value="@{{break_time.id}}">
+                            <button type="submit" class="btn btn-danger">削除</button>
+                        </form>
+                    </td>
+            </tr>
+            <!-- end v-for break_times -->
+        </table>
+
+    </div>
+
+
+
+
     <!-- TableContainer -->
     <div class="table_container mb-5">
 
-        <!--ホバーテーブル(table-hover)-->
-        <table class="table table-hover bg-white text-center" style="width: 900px;">
+        <!--テーブル-->
+        <table class="table bg-white text-center" style="width: 900px;">
             <thead class="border-secondary">
                 <tr>
                     <th scope="col">氏 名</th>
@@ -94,55 +161,64 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody>
 
-                @forelse ($work_times as $w_index => $work_time)
-                <tr  data-bs-toggle="modal" data-bs-target="#{{'updateForm'.$w_index}}" style="cursor: pointer">
-                    <th scope="row">{{$work_time->employee->name}}</th>
-                    <td>{{$work_time->text}}</td>
+            <!-- v-for worrk_times -->
+            <tbody v-for="(work_time, w_index) in work_times"  class="border-0">
+                <tr>
+                    <th scope="row">@{{work_time.employee.name}}</th>
+                    <td>@{{work_time.text}}</td>
                     <td></td>
 
-                    <td>{{$work_time->restrain_hour}}</td> <!-- 勤務時間(h) -->
-                    <td>{{$work_time->break_hour}}</td> <!-- 休憩時間(h) -->
-                    <td>{{$work_time->working_hour}}</td> <!-- 労働時間(h) -->
-                    <td>{{$work_time->night_hour}}</td> <!-- 深夜時間(h) -->
+                    <td>@{{work_time.restrain_hour}}</td> <!-- 勤務時間(h) -->
+                    <td>@{{work_time.break_hour}}</td> <!-- 休憩時間(h) -->
+                    <td>@{{work_time.working_hour}}</td> <!-- 労働時間(h) -->
+                    <td>@{{work_time.night_hour}}</td> <!-- 深夜時間(h) -->
 
                     <td> <!-- 修正モーダルボタン('updateForm'.$w_index) -->
-                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#{{'updateForm'.$w_index}}">
+                        {{-- <button type="button" class="btn btn-warning" data-bs-toggle="modal" :data-bs-target="'#updateForm'+w_index">
                             修正
+                        </button> --}}
+
+                        <button type="button" class="btn btn-warning" @click="editWorkTime(w_index)">
+                            テスト修正
                         </button>
                     </td>
                     <td> <!-- 削除モーダルボタン('destroyForm'.$w_index) -->
-                        <button type="button"class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#{{'destroyForm'.$w_index}}">
+                        <button type="button"class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#{{'destroyForm'.$w_index=1}}">
                             削除
                         </button>
                     </td>
                 </tr>
 
-                    @foreach ($work_time->break_times as $break_time)
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td>{{$break_time->text}}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    @endforeach
+                <!-- v-for break_times -->
+                <tr v-for="(break_time, b_index) in work_time.break_times">
+                    <td></td>
+                    <td></td>
+                    <td>@{{break_time.text}}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <!-- end v-for break_times -->
 
-                <!-- 勤務記録が存在しないとき -->
-                @empty
-                    <tr>
-                        <th colspan="9" class="text-secondary">
-                            勤務記録がありません
-                        </th>
-                    </tr>
-                @endforelse
 
             </tbody>
+            <!-- end v-for worrk_times -->
+
+
+            <!-- 勤務記録が存在しないとき -->
+            <tbody  v-show="!work_times.length" class="border-0">
+                <tr>
+                    <th colspan="9" class="text-secondary">
+                        勤務記録がありません
+                    </th>
+                </tr>
+            </tbody>
+
+
             <tfoot class="border-secondary">
                 <tr>
                     <th scope="col"></th>

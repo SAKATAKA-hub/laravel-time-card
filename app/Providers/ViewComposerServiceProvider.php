@@ -26,7 +26,7 @@ class ViewComposerServiceProvider extends ServiceProvider
         View::Composer('date_list','App\Http\ViewComposers\DateListComposer');
         View::Composer('month_list','App\Http\ViewComposers\MonthListComposer');
         View::Composer('parsonal_list','App\Http\ViewComposers\ParsonalListComposer');
-        View::Composer('edit_work_record','App\Http\ViewComposers\EditWorkRecordComposer');
+        View::Composer('edit_work_record.index','App\Http\ViewComposers\EditWorkRecordComposer');
 
         View::Composer('*','App\Http\ViewComposers\NavMenuComposer');
 

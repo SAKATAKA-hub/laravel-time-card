@@ -42,9 +42,9 @@ Route::get('vuejs', function () {
 
 
 /*
- |----------------------------------------
- | フォームバリデーションテスト
- |---------------------------------------- |
+|----------------------------------------
+| フォームバリデーションテスト
+|---------------------------------------- |
 */
 Route::get('test/form', [TestController::class,'form_index'])
 ->name('test/form');
@@ -84,9 +84,20 @@ Route::get('parsonal_list', [WorkRecordListController::class,'parsonal_list'])
 
 
 
+/*
+|----------------------------------------
+| 勤怠修正
+|---------------------------------------- |
+*/
 # 勤怠修正ページの表示(edit_work_record)
 Route::get('edit_work_record', [EditWorkRecordController::class,'edit_work_record'])
 ->name('edit_work_record');
+
+# 勤怠修正ページのJSONデータ(edit_work_record_json)
+Route::post('edit_work_record_json', [EditWorkRecordController::class,'edit_work_record_json'])
+->name('edit_work_record_json');
+
+
 
 # 勤怠情報の修正(update_work_record)
 Route::patch('update_work_record', [EditWorkRecordController::class,'update_work_record'])

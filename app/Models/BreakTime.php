@@ -26,10 +26,10 @@ class BreakTime extends Model
     | リレーション
     |--------------------------------------------------------------------------
     */
-        // public function work_time()
-        // {
-        //     return $this->belongsTo(WorkTime::class);
-        // }
+        public function work_time()
+        {
+            return $this->belongsTo(WorkTime::class);
+        }
 
     /*
     |--------------------------------------------------------------------------
@@ -53,7 +53,7 @@ class BreakTime extends Model
         $out = isset($this->out) ? substr($this->out, 0, 5) : '--:--';
         $hour = $this->hour;
 
-        return sprintf('%s - %s(%.2f)',$in,$out,$hour);
+        return sprintf('%s - %s (%.2f)',$in,$out,$hour);
     }
 
 

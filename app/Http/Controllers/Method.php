@@ -41,19 +41,20 @@ class Method extends Controller
      * @param Array $work_times //勤怠記録
      * @return String
     */
-    public function jsonWorkTimes($work_times)
+    public function WorkTimesForJson($work_times)
     {
         foreach($work_times as $work_time)
         {
-            $work_time->in = substr($work_time->in,0,5);
-            $work_time->out = substr($work_time->out,0,5);
-            $work_time->date_text = $work_time->date_text;
+            $work_time->employee = $work_time->employee;
+            $work_time->text = $work_time->text;
             $work_time->break_times = Method::jsonBreakTimes($work_time->break_times);
-
             $work_time->restrain_hour= $work_time->restrain_hour;
             $work_time->break_hour = $work_time->break_hour;
             $work_time->working_hour = $work_time->working_hour;
-            $work_time->night_hou = $work_time->night_hou;
+            $work_time->night_hour = $work_time->night_hour;
+
+            $work_time->input_in = substr($work_time->in,0,5);
+            $work_time->input_out = $work_time->out!=='24:00:00' ? substr($work_time->out,0,5) : '00:00';
         }
 
         return $work_times;
@@ -70,11 +71,19 @@ class Method extends Controller
     */
     public function jsonBreakTimes($break_times)
     {
-        foreach($break_times as $break_time)
+        foreach($break_times as $index => $break_time)
         {
-            $break_time->in = substr($break_time->in,0,5);
-            $break_time->out = substr($break_time->out,0,5);
-            $break_time->date_text = $break_time->date_text;
+            $break_time->text = $break_time->text;
+            $break_time->input_in = substr($break_time->in,0,5);
+            $break_time->input_out = $break_time->out!=='24:00:00' ? substr($break_time->out,0,5) : '00:00';
+
+            # バリデーション用　休憩時間の最低値・最高値
+            $break_time->min_in =  $index ?
+                substr($break_times[$index -1]->input_out,0,5) : substr($break_time->work_time->in,0,5);
+
+            $break_time->max_out =  $index !== $break_times->count() -1 ?
+               substr($break_times[$index +1]->in,0,5) :
+               ( !empty($break_time->work_time->out) ? substr($break_time->work_time->out,0,5) : NULL );
         }
 
         return $break_times;
