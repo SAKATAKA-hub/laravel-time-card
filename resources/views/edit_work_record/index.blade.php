@@ -131,7 +131,7 @@
                         <label class="me-2">出勤</label>
                     </div>
                     <div class="col-auto">
-                        <input class="form-control" type="time" v-model="editing_work_time.input_in" @change="changeWorkTime">
+                        <input class="form-control" type="time" v-model="editing_work_time.input_in" @blur="changeWorkTime">
                     </div>
                 </div></th>
 
@@ -162,7 +162,7 @@
                             <label class="ms-3 me-2">休憩開始</label>
                         </div>
                         <div class="col-auto">
-                            <input class="form-control" type="time" name="break_time_in[]" v-model="break_time.input_in">
+                            <input class="form-control" type="time" name="break_time_in[]" v-model="break_time.input_in" @blur="changeWorkTime">
                         </div>
                     </div></td>
 
@@ -173,11 +173,8 @@
                             <label class="ms-3 me-2">休憩終了</label>
                         </div>
                         <div class="col-auto">
-                            <input class="form-control" type="time" name="break_time_out[]" v-model="break_time.input_out">
+                            <input class="form-control" type="time" name="break_time_out[]" v-model="break_time.input_out" @blur="changeWorkTime">
                         </div>
-                        {{-- <div class="col-auto">
-                            <span style="cursor:pointer;" v-if="b_index===editing_work_time.break_times.length-1" @click="deleteInput(b_index)"><i class="bi bi-file-x fs-2 text-secondary"></i></span>
-                        </div> --}}
                         <div class="col-auto">
                             <span style="cursor:pointer;" v-if="(b_index===editing_work_time.break_times.length-1)&&(editing_work_time.input_out==='')" @click="deleteInput(b_index)"><i class="bi bi-file-x fs-2 text-secondary"></i></span>
                         </div>
@@ -196,6 +193,20 @@
                     </td>
             </tr>
             <!-- end v-for break_times -->
+
+            <tr v-if="errors">
+                <td colspan="3" class="text-danger">
+                    <ul>
+                        <li v-if="errors.valiWorkTime_in">@{{errors.valiWorkTime_in}}</li>
+                        <li v-if="errors['valiWorkTime_out']">@{{valiWorkTime_out}}</li>
+                    </ul>
+                    <ul v-for="(break_time, i) in editing_work_time.break_times">
+                        <li v-if="errors['valiBreakTimes_'+i+'_in']">@{{errors['valiBreakTimes_'+i+'_in']}}</li>
+                        <li v-if="errors['valiBreakTimes_'+i+'_out']">@{{errors['valiBreakTimes_'+i+'_out']}}</li>
+                    </ul>
+
+                </td>
+            </tr>
         </table>
         <button type="button" class="btn btn-secondary" @click="editCancel()">
             閉じる

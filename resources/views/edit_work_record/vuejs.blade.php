@@ -27,7 +27,7 @@
                 // 表示データ
                 work_times : [],
                 total_times : [],
-                errors : [],
+                errors : null,
 
                 // 編集データ
                 editing_index : null,
@@ -107,7 +107,7 @@
                     this.editing_work_time = [];
                     this.remember_work_time = [];
                     this.delete_bleak_times = [];
-                    this.errors = [];
+                    this.errors = null;
                 },
 
 
@@ -129,7 +129,7 @@
 
 
                     // エラーのリセット
-                    this.errors = [];
+                    this.errors = null;
 
                     // 非同期通信
                     fetch( route.validate_input_time, {
@@ -150,12 +150,16 @@
                         {
                             console.log(json);
                             this.errors = json.errors;
+                            this.editing_work_time = Object.assign({}, this.remember_work_time );
+
+
+                            console.log(this.errors.valiWorkTime_in);
                         }
                         // バリデーション成功後の処理
                         else
                         {
                             console.log(json);
-                            this.errors = [];
+                            this.errors = null;
                             alert('リクエストが成功しました。');
                         }
 
@@ -228,7 +232,7 @@
                 //         else
                 //         {
                 //             console.log(json);
-                //             this.errors = [];
+                //             this.errors = null;
                 //             this.work = json.work;
                 //             alert('リクエストが成功しました。');
                 //         }
