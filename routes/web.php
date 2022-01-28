@@ -90,13 +90,17 @@ Route::get('parsonal_list', [WorkRecordListController::class,'parsonal_list'])
 |---------------------------------------- |
 */
 # 勤怠修正ページの表示(edit_work_record)
-Route::get('edit_work_record', [EditWorkRecordController::class,'edit_work_record'])
+Route::get('edit_work_record/', [EditWorkRecordController::class,'index'])
 ->name('edit_work_record');
 
 # 勤怠修正ページのJSONデータ(edit_work_record_json)
-Route::post('edit_work_record_json', [EditWorkRecordController::class,'edit_work_record_json'])
-->name('edit_work_record_json');
+Route::post('edit_work_record/records_json', [EditWorkRecordController::class,'records_json'])
+->name('edit_work_record.records_json');
 
+
+# 入力した勤怠時間のバリデーションチェック(validate_input_time)
+Route::post('edit_work_record/validate_input_time', [EditWorkRecordController::class,'validate_input_time'])
+->name('edit_work_record.validate_input_time');
 
 
 # 勤怠情報の修正(update_work_record)
@@ -107,6 +111,6 @@ Route::patch('update_work_record', [EditWorkRecordController::class,'update_work
 Route::delete('destroy_work_record', [EditWorkRecordController::class,'destroy_work_record'])
 ->name('destroy_work_record');
 
-# 休憩の削除(destroy_break_record)
+# 休憩の削除(destroy_break_record) ※のちほど修正に含む
 Route::delete('destroy_break_record', [EditWorkRecordController::class,'destroy_break_record'])
 ->name('destroy_break_record');

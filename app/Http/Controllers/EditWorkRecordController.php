@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\WorkTimeRecordFormRequest;
+
 use App\Models\WorkTime;
 use App\Models\BreakTime;
 use App\Models\Employee;
@@ -12,12 +14,12 @@ use Carbon\Carbon;
 class EditWorkRecordController extends Controller
 {
     /**
-     * 勤怠修正ページの表示(edit_work_record)
+     * 勤怠修正ページの表示(index)
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\View\View
     */
-    public function edit_work_record(Request $request)
+    public function index(Request $request)
     {
         # ユーザーID
         $user_id = 1;
@@ -48,19 +50,21 @@ class EditWorkRecordController extends Controller
             'night_hour' => Method::groupTotalTime($time_name='night_hour', $work_times), //総深夜時間(h)
         ];
 
-
         return view( 'edit_work_record.index',compact('user_id','date','date_ob','weeks','work_times','total_times') );
     }
 
 
+
+
     /**
-     * 勤怠修正ページのJSONデータ(edit_work_record_json)
+     * 勤怠修正ページのJSONデータ(records_json)
      *
      * @param \Illuminate\Http\Request $request
      * @return Json
     */
-    public function edit_work_record_json(Request $request)
+    public function records_json(Request $request)
     {
+
         list($user_id, $date) =  [$request->user_id,$request->date];
 
 
@@ -84,6 +88,27 @@ class EditWorkRecordController extends Controller
             compact('work_times', 'total_times')
         );
     }
+
+
+
+
+    /**
+     * 入力した勤怠時間のバリデーションチェック(validate_input_time)
+     *
+     * @param App\Http\Requests\WorkTimeRecordFormRequest $request
+     * @return Json
+    */
+    public function validate_input_time(WorkTimeRecordFormRequest $request)
+    {
+        // dd($request->work_time);
+        $work_time = $request->work_time;
+
+        return response()->json([
+            'comment' => 'validation OK!',
+            'work_time' => $work_time,
+        ]);
+    }
+
 
 
 
