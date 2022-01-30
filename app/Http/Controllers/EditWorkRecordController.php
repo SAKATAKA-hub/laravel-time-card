@@ -24,6 +24,7 @@ class EditWorkRecordController extends Controller
         # ユーザーID
         $user_id = 1;
 
+
         # 日付の指定
         // 日付指定のリクエストが無ければ、今日の日付
         $date = empty( $request->date ) ? Carbon::parse('now')->format('Y-m-d') : $request->date;
@@ -34,23 +35,9 @@ class EditWorkRecordController extends Controller
         $weeks =['(日)','(月)','(火)','(水)','(木)','(金)','(土)',];
 
 
-        # (ユーザーに紐づく)従業員と日付を指定した、勤務データの取得
-        $work_times =
-        WorkTime::employees($user_id)->where('date',$date)->orderBy('in','asc')->get();
-
-        # ＪSON送信用にデータを加工
-        $work_times = $work_times->count()? Method::WorkTimesForJson($work_times) : $work_times;
-
-
-        # 集計時間
-        $total_times = [
-            'restrain_hour' => Method::groupTotalTime($time_name='restrain_hour', $work_times), //総勤務時間(h)
-            'break_hour' => Method::groupTotalTime($time_name='break_hour', $work_times), //総休憩時間(h)
-            'working_hour' => Method::groupTotalTime($time_name='working_hour', $work_times), //総労働時間(h)
-            'night_hour' => Method::groupTotalTime($time_name='night_hour', $work_times), //総深夜時間(h)
-        ];
-
-        return view( 'edit_work_record.index',compact('user_id','date','date_ob','weeks','work_times','total_times') );
+        return view( 'edit_work_record.index',
+            compact('user_id','date','date_ob','weeks',)
+        );
     }
 
 
@@ -72,7 +59,7 @@ class EditWorkRecordController extends Controller
         $work_times =
         WorkTime::employees($user_id)->where('date',$date)->orderBy('in','asc')->get();
 
-        # ＪSON送信用にデータを加工
+        # JSON送信用にデータを加工
         $work_times = $work_times->count()? Method::WorkTimesForJson($work_times) : $work_times;
 
 

@@ -27,13 +27,13 @@
                 // 表示データ
                 work_times : [],
                 total_times : [],
-                errors : null,
+                errors : [],
 
                 // 編集データ
                 editing_index : null,
                 editing_work_time : [],
                 remember_work_time : [],
-                delete_bleak_times : [],
+                delete_break_times : [],
 
             }, //end data
 
@@ -60,18 +60,20 @@
                     // JSONをdataにコピー
                     console.log(json);
                     this.work_times = json.work_times;
-                    this.total_times = json.total_time;
-
-
-
+                    this.total_times = json.total_times;
 
                     /* --------------------------------------------------------------------------
                     | 作業用コード
                     */
-                    let index = 2;
-                    this.editing_index = index;
-                    this.editing_work_time = Object.assign({}, this.work_times[index] );
-                    this.remember_work_time = Object.assign({}, this.work_times[index] );
+                    if(this.form_test){
+                        let index = 2;
+                        this.editing_index = index;
+
+                        let assign_ob = this.work_times[index];
+                        this.editing_work_time = this.assign_time(assign_ob);
+                        this.remember_work_time = this.assign_time(assign_ob);
+
+                    }
                     //----------------------------------------------------------------------------
 
                 })
@@ -92,10 +94,9 @@
                 */
                 editStart : function(index){
                     this.editing_index = index;
-                    this.editing_work_time = Object.assign({}, this.work_times[index] );
-                    this.remember_work_time = Object.assign({}, this.work_times[index] );
-
-                    console.log(this.remember_work_time);
+                    let assign_ob = this.work_times[index];
+                    this.editing_work_time = this.assign_time(assign_ob);
+                    this.remember_work_time = this.assign_time(assign_ob);
                 },
 
 
@@ -106,8 +107,8 @@
                     this.editing_index = null;
                     this.editing_work_time = [];
                     this.remember_work_time = [];
-                    this.delete_bleak_times = [];
-                    this.errors = null;
+                    this.delete_break_times = [];
+                    this.errors = [];
                 },
 
 
@@ -115,21 +116,8 @@
                 | 3. 出退勤時間入力チェック(changeWorkTime)
                 */
                 changeWorkTime : function(){
-                    const work = this.editing_work_time;
-                    const breaks = work.break_times;
-
-
-                    console.log({
-                        in : work.input_in,
-                        out : work.input_out,
-                        // max_in : work.input_out.length ? work.input_out : '24:00',
-                        // mmin_out : work.input_in,
-                    });
-
-
-
                     // エラーのリセット
-                    this.errors = null;
+                    this.errors = [];
 
                     // 非同期通信
                     fetch( route.validate_input_time, {
@@ -149,9 +137,10 @@
                         if(json.errors)
                         {
                             console.log(json);
+                            // エラー内容の保存
                             this.errors = json.errors;
-                            this.editing_work_time = Object.assign({}, this.remember_work_time );
-
+                            // 編集内容をエラー前に戻す
+                            this.editing_work_time = this.assign_time(this.remember_work_time);
 
                             console.log(this.errors.valiWorkTime_in);
                         }
@@ -159,7 +148,9 @@
                         else
                         {
                             console.log(json);
-                            this.errors = null;
+                            this.errors = [];
+                            this.remember_work_time = this.assign_time(this.editing_work_time);
+
                             alert('リクエストが成功しました。');
                         }
 
@@ -173,21 +164,59 @@
                 },
 
                 /*
-                | 4. 休憩時間入力チェック(changeBreakTime)
+                | 4. 休憩時間の削除(deleteBreakRecord)
+                */
+                deleteBreakRecord : function(b_index){
+
+                    console.log(b_index+'休憩時間の削除');
+                },
+
+                /*
+                | 5. 勤務記録の更新(updateWorkRecord)
+                */
+                updateWorkRecord : function(){
+
+                    console.log(this.editing_index+'勤務時間の更新');
+                },
+
+                /*
+                | 6. 勤務記録の削除(deleteWorkRecord)
+                */
+                deleteWorkRecord : function(){
+
+                    console.log(this.editing_index+'勤務時間の削除');
+                },
+
+
+
+                /*
+                |------------------------------------------
+                | メソッド内で利用するメソッド
+                |------------------------------------------
                 */
 
                 /*
-                | 5. 休憩時間の削除(deleteBreakRecord)
+                 * M-1 勤務時間オブジェクトのコピーを返す
+                 *
+                 * @Param assign_ob (コピー元のオブジェクト)
                 */
+                assign_time : function(assign_ob){
 
-                /*
-                | 6. 勤務記録の更新(updateWorkRecord)
-                */
+                    // 勤務時間のコピー
+                    const work_time = Object.assign({},assign_ob);
 
-                /*
-                | 7. 勤務記録の削除(deleteWorkRecord)
-                */
+                    // 休憩時間のコピー
+                    const assign_break_times = assign_ob.break_times;
+                    const break_times = [];
+                    for (let b_index = 0; b_index < Object.keys(assign_break_times).length; b_index++) {
+                        break_times[b_index] = Object.assign( {}, assign_break_times[b_index] );
+                    }
 
+                    // 休憩時間オブジェクトを勤務時間オブジェクトへ保存
+                    work_time.break_times = Object.assign( {},break_times );
+
+                    return work_time;
+                },
 
 
                 deleteInput : function(break_index){
@@ -203,47 +232,6 @@
 
 
 
-                // onSubmit: function(){
-
-
-
-                //     // 非同期通信
-                //     fetch( route.ajax_form_post, {
-                //         method: 'POST',
-                //         body: new URLSearchParams({
-                //             _token: token,
-                //             in: this.work.in,
-                //             out: this.work.out,
-                //         }),
-                //     })
-                //     .then(response => {
-                //         if(!response.ok){ throw new Error(); }
-                //         return response.json();
-                //     })
-                //     .then(json => {
-
-                //         // バリデーション失敗の処理
-                //         if(json.errors)
-                //         {
-                //             console.log(json);
-                //             this.errors = json.errors;
-                //         }
-                //         // バリデーション成功後の処理
-                //         else
-                //         {
-                //             console.log(json);
-                //             this.errors = null;
-                //             this.work = json.work;
-                //             alert('リクエストが成功しました。');
-                //         }
-
-                //     })
-                //     .catch(error => {
-                //         alert('データの読み込みに失敗しました。');
-
-                //     });
-
-                // },
             }, //end methods
         });
 

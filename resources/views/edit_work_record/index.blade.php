@@ -35,6 +35,12 @@
     <meta name="user_id" content="{{$user_id}}">
     <meta name="date" content="{{$date}}">
 
+    <style>
+        .err_input{
+            background-color: pink;
+        }
+    </style>
+
 @endsection
 
 
@@ -87,130 +93,9 @@
 
 
     <!-- テストコンテナー -->
-    <div v-show="form_test" class="mb-3 p-3 bg-white">
-        <h3 class="border-bottom mb-3">JSONテスト(@{{form_test}})</h3>
 
-        <ul>
-
-            <li>
-                <p class="d-inline" style="color:red;">勤怠修正ページのJSONデータ</p>
-                <form method="POST" action="{{route('edit_work_record.records_json')}}" class="d-inline">
-                    @csrf
-                    <input type="hidden" name="user_id" value="{{$user_id}}">
-                    <input type="hidden" name="date" value="{{$date}}">
-
-
-                    <button type="submit">実行</button>
-                </form>
-            </li>
-
-            <li>
-                <p class="d-inline" style="color:red;">入力した勤怠時間のバリデーションチェック</p>
-                <form method="POST" action="{{route('edit_work_record.validate_input_time')}}" class="d-inline">
-                    @csrf
-                    <input type="hidden" name="work_time" :value="JSON.stringify(editing_work_time)">
-
-                    <button type="submit">実行</button>
-                </form>
-            </li>
-
-
-        </ul>
-    </div>
-
-
-    <!-- 編集モーダル -->
-    <div v-show="form_test" class="mb-3 p-3 bg-white">
-        <h3 class="border-bottom mb-3">編集モーダル</h3>
-        <table class="table bg-white" style="max-width: 900px;">
-
-            <!--出退勤時間-->
-            <tr>
-                <th><div class="d-flex align-items-center">
-                    <div class="col-auto">
-                        <label class="me-2">出勤</label>
-                    </div>
-                    <div class="col-auto">
-                        <input class="form-control" type="time" v-model="editing_work_time.input_in" @blur="changeWorkTime">
-                    </div>
-                </div></th>
-
-
-                <th><div class="d-flex align-items-center">
-                    <div class="col-auto">
-                        <label class="me-2">退勤</label>
-                    </div>
-                    <div class="col-auto">
-                        <input class="form-control" type="time" v-model="editing_work_time.input_out" @change="changeWorkTime">
-                    </div>
-                    <div class="col-auto">
-                        <span style="cursor:pointer;" @click="deleteInput(null)"><i class="bi bi-file-x fs-2 text-secondary"></i></span>
-                    </div>
-                </div></th>
-
-
-                <td><!-- 削除ボタン --></td>
-            </tr>
-
-
-
-            <!--休憩時間-->
-            <!-- v-for break_times -->
-            <tr v-for="(break_time, b_index) in editing_work_time.break_times">
-                    <td><div class="d-flex align-items-center">
-                        <div class="col-auto">
-                            <label class="ms-3 me-2">休憩開始</label>
-                        </div>
-                        <div class="col-auto">
-                            <input class="form-control" type="time" name="break_time_in[]" v-model="break_time.input_in" @blur="changeWorkTime">
-                        </div>
-                    </div></td>
-
-
-                    <td><div class="d-flex align-items-center">
-
-                        <div class="col-auto">
-                            <label class="ms-3 me-2">休憩終了</label>
-                        </div>
-                        <div class="col-auto">
-                            <input class="form-control" type="time" name="break_time_out[]" v-model="break_time.input_out" @blur="changeWorkTime">
-                        </div>
-                        <div class="col-auto">
-                            <span style="cursor:pointer;" v-if="(b_index===editing_work_time.break_times.length-1)&&(editing_work_time.input_out==='')" @click="deleteInput(b_index)"><i class="bi bi-file-x fs-2 text-secondary"></i></span>
-                        </div>
-                    </div></td>
-
-
-                    <td>
-                        <button type="button" class="btn btn-danger">削除</button>
-                        {{-- <form method="Post" action="{{route('destroy_break_record')}}">
-                            @method('DELETE')
-                            @csrf
-                            <input type="hidden" name="date" value="{{$date_ob->format('Y-m-d')}}">
-                            <input type="hidden" name="break_time_id" value="@{{break_time.id}}">
-                            <button type="submit" class="btn btn-danger">削除</button>
-                        </form> --}}
-                    </td>
-            </tr>
-            <!-- end v-for break_times -->
-
-            <tr v-if="errors">
-                <td colspan="3" class="text-danger">
-                    <ul>
-                        <li v-if="errors.valiWorkTime_in">@{{errors.valiWorkTime_in}}</li>
-                        <li v-if="errors['valiWorkTime_out']">@{{valiWorkTime_out}}</li>
-                    </ul>
-                    <ul v-for="(break_time, i) in editing_work_time.break_times">
-                        <li v-if="errors['valiBreakTimes_'+i+'_in']">@{{errors['valiBreakTimes_'+i+'_in']}}</li>
-                        <li v-if="errors['valiBreakTimes_'+i+'_out']">@{{errors['valiBreakTimes_'+i+'_out']}}</li>
-                    </ul>
-
-                </td>
-            </tr>
-        </table>
-        <button type="button" class="btn btn-secondary" @click="editCancel()">
-            閉じる
-        </button>
+    <div v-show="form_test">
+        @include('test.edit_work_record')
     </div>
 
 
@@ -248,16 +133,12 @@
                     <td>@{{work_time.night_hour}}</td> <!-- 深夜時間(h) -->
 
                     <td> <!-- 修正モーダルボタン('updateForm'.$w_index) -->
-                        {{-- <button type="button" class="btn btn-warning" data-bs-toggle="modal" :data-bs-target="'#updateForm'+w_index">
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal" @click="editStart(w_index)">
                             修正
-                        </button> --}}
-
-                        <button type="button" class="btn btn-warning" @click="editStart(w_index)">
-                            テスト修正
                         </button>
                     </td>
                     <td> <!-- 削除モーダルボタン('destroyForm'.$w_index) -->
-                        <button type="button"class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#{{'destroyForm'.$w_index=1}}">
+                        <button type="button"class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#destroyModal" @click="editStart(w_index)">
                             削除
                         </button>
                     </td>
@@ -292,15 +173,15 @@
             </tbody>
 
 
-            <tfoot class="border-secondary">
+            <tfoot class="border-secondary" v-if="Object.keys(total_times).length">
                 <tr>
                     <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col"></th>
-                    <th scope="col">{{$total_times['restrain_hour']}}</th> <!-- 総勤務時間(h) -->
-                    <th scope="col">{{$total_times['break_hour']}}</th> <!-- 総休憩時間(h) -->
-                    <th scope="col">{{$total_times['working_hour']}}</th> <!-- 総労働時間(h) -->
-                    <th scope="col">{{$total_times['night_hour']}}</th> <!-- 総深夜時間(h) -->
+                    <th scope="col">@{{total_times['restrain_hour']}}</th> <!-- 総勤務時間(h) -->
+                    <th scope="col">@{{total_times['break_hour']}}</th> <!-- 総休憩時間(h) -->
+                    <th scope="col">@{{total_times['working_hour']}}</th> <!-- 総労働時間(h) -->
+                    <th scope="col">@{{total_times['night_hour']}}</th> <!-- 総深夜時間(h) -->
                     <th></th>
                     <th></th>
                 </tr>
@@ -317,126 +198,149 @@
     -----------------------------------------
     -->
 
-    {{-- @foreach ($work_times as $w_index => $work_time)
-
-        <!--  勤怠修正モーダル  -->
-        <div class="modal fade" id="{{'updateForm'.$w_index}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form method="Post" action="{{route('update_work_record')}}">
-                        @method('PATCH')
-                        @csrf
-                        <input type="hidden" name="date" value="{{$date_ob->format('Y-m-d')}}">
-                        <input type="hidden" name="work_time_id" value="{{$work_time->id}}">
+    <!--  勤怠修正モーダル (id="editModal")  -->
+    <div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
 
 
-                        <!-- modal-header -->
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="staticBackdropLabel">
-                                {{$date_ob->format('Y年m月d日').$weeks[$date_ob->format('w')]}} {{$work_time->employee->name}}
-                            </h5>
-                        </div>
+                <!-- modal-header -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel" v-if="Object.keys(editing_work_time).length">
+                        {{$date_ob->format('Y年m月d日').$weeks[$date_ob->format('w')]}} @{{editing_work_time.employee.name}}
+                    </h5>
+                </div>
 
 
 
 
-                        <!-- modal-body -->
-                        <div class="modal-body">
-                            <table class="table bg-white">
+                <!-- modal-body -->
+                <div class="modal-body">
+                    <table class="table bg-white" style="max-width: 900px;">
 
-                                <!--出退勤時間-->
-                                <tr>
-                                    <th>出勤<input type="time" name="work_time_in" value="{{substr($work_time->in,0,5)}}"></th>
-                                    <th>退勤 <input type="time" name="work_time_out" value="{{substr($work_time->out,0,5)}}"></th>
-                                    <td></td>
-                                </tr>
-
-                                <!--休憩時間-->
-                                @foreach ($work_time->break_times as $break_time)
-                                    <tr>
-                                        <td>休憩開始 <input type="time" name="break_time_in[]" value="{{substr($break_time->in,0,5)}}"></td>
-                                        <td>休憩終了 <input type="time" name="break_time_out[]" value="{{substr($break_time->out,0,5)}}"></td>
-                                        <td>
-                                            <form method="Post" action="{{route('destroy_break_record')}}">
-                                                @method('DELETE')
-                                                @csrf
-                                                <input type="hidden" name="date" value="{{$date_ob->format('Y-m-d')}}">
-                                                <input type="hidden" name="break_time_id" value="{{$break_time->id}}">
-                                                <button type="submit" class="btn btn-danger">削除</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </table>
-
-
-                            <div style="height:6rem;">
-                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                    エラー：エラーメッセージ！
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <!--出退勤時間-->
+                        <tr>
+                            <th><div class="d-flex align-items-center">
+                                <div class="col-auto">
+                                    <label class="me-2">出勤</label>
                                 </div>
-                            </div>
+                                <div class="col-auto">
+                                    <input class="form-control" type="time" v-model="editing_work_time.input_in" @blur="changeWorkTime">
+                                </div>
+                            </div></th>
+
+
+                            <th><div class="d-flex align-items-center">
+                                <div class="col-auto">
+                                    <label class="me-2">退勤</label>
+                                </div>
+                                <div class="col-auto">
+                                    <input class="form-control" type="time" v-model="editing_work_time.input_out" @change="changeWorkTime">
+                                </div>
+                                <div class="col-auto">
+                                    <span style="cursor:pointer;" @click="deleteInput(null)"><i class="bi bi-file-x fs-2 text-secondary"></i></span>
+                                </div>
+                            </div></th>
+
+
+                            <td><!-- 削除ボタン --></td>
+                        </tr>
+
+
+
+                        <!--休憩時間-->
+                        <!-- v-for break_times -->
+                        <tr v-for="(break_time, b_index) in editing_work_time.break_times">
+                                <td><div class="d-flex align-items-center">
+                                    <div class="col-auto">
+                                        <label class="ms-3 me-2">休憩開始</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input class="form-control" type="time" name="break_time_in[]" v-model="break_time.input_in" @blur="changeWorkTime">
+                                    </div>
+                                </div></td>
+
+
+                                <td><div class="d-flex align-items-center">
+
+                                    <div class="col-auto">
+                                        <label class="ms-3 me-2">休憩終了</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input class="form-control" type="time" name="break_time_out[]" v-model="break_time.input_out" @blur="changeWorkTime">
+                                    </div>
+                                    <div class="col-auto">
+                                        <span style="cursor:pointer;" v-if="(b_index===editing_work_time.break_times.length-1)&&(editing_work_time.input_out==='')" @click="deleteInput(b_index)"><i class="bi bi-file-x fs-2 text-secondary"></i></span>
+                                    </div>
+                                </div></td>
+
+
+                                <td>
+                                    <button type="button" class="btn btn-danger" @click="deleteBreakRecord(b_index)">削除</button>
+                                </td>
+                        </tr>
+                        <!-- end v-for break_times -->
+                    </table>
+
+
+                    <div v-if="Object.keys(errors).length">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <h5>エラーメッセージ</h5>
+                            <ul>
+                                <li v-if="errors.valiWorkTime_in">@{{errors.valiWorkTime_in}}</li>
+                                <li v-if="errors['valiWorkTime_out']">@{{valiWorkTime_out}}</li>
+                            </ul>
+                            <ul v-for="(break_time, i) in editing_work_time.break_times">
+                                <li v-if="errors['valiBreakTimes_'+i+'_in']">@{{errors['valiBreakTimes_'+i+'_in']}}</li>
+                                <li v-if="errors['valiBreakTimes_'+i+'_out']">@{{errors['valiBreakTimes_'+i+'_out']}}</li>
+                            </ul>
                         </div>
+                    </div>
 
-
-
-
-                        <!-- modal-footer -->
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
-                            <button type="submit" class="btn btn-primary">更新</button>
-                        </div>
-
-
-                    </form>
                 </div>
+
+
+
+
+                <!-- modal-footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="editCancel()">閉じる</button>
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">更新</button>
+                </div>
+
+
             </div>
         </div>
-
-        <!--  勤怠削除モーダル  -->
-        <div class="modal fade" id="{{'destroyForm'.$w_index}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form method="Post" action="{{route('destroy_work_record')}}">
-                        @method('DELETE')
-                        @csrf
-                        <input type="hidden" name="date" value="{{$date_ob->format('Y-m-d')}}">
-                        <input type="hidden" name="work_time_id" value="{{$work_time->id}}">
+    </div>
 
 
-                        <!-- modal-header -->
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="staticBackdropLabel">
-                                {{$date_ob->format('Y年m月d日').$weeks[$date_ob->format('w')]}} {{$work_time->employee->name}}
-                            </h5>
-                        </div>
+    <!--  勤怠削除モーダル  -->
+    <div class="modal fade" id="destroyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
 
-
-                        <!-- modal-body -->
-                        <div class="modal-body">
-                            ”{{$work_time->text}}”の勤務記録を削除します。よろしいですか？
-                        </div>
-
-                        <!-- modal-footer -->
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
-                            <button type="submit" class="btn btn-danger">削除</button>
-                        </div>
-
-
-                    </form>
+                <!-- modal-header -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel" v-if="Object.keys(editing_work_time).length">
+                        {{$date_ob->format('Y年m月d日').$weeks[$date_ob->format('w')]}} @{{editing_work_time.employee.name}}
+                    </h5>
                 </div>
+
+
+                <!-- modal-body -->
+                <div class="modal-body">
+                    ”@{{editing_work_time.text}}”の勤務記録を削除します。よろしいですか？
+                </div>
+
+                <!-- modal-footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="editCancel()">閉じる</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">削除</button>
+                </div>
+
             </div>
         </div>
-
-    @endforeach --}}
-
-
-
-
-
-
-
+    </div>
 
 
     <!-- 日付変更モーダル -->
