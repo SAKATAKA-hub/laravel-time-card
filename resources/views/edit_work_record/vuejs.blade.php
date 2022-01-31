@@ -217,10 +217,12 @@
                         else
                         {
                             console.log(json);
-                            this.errors = [];
-                            this.remember_work_time = this.assign_time(this.editing_work_time);
+                            // this.errors = [];
+                            // this.remember_work_time = this.assign_time(this.editing_work_time);
                             this.work_times = json[0].work_times;
                             this.total_times = json[0].total_times;
+
+                            this.editCancel(); //勤怠編集モーダル関係データのリセット
 
                             alert('勤怠情報を更新しました。');
                         }
@@ -254,27 +256,15 @@
                         return response.json();
                     })
                     .then(json => {
+                        console.log(json);
+                        this.errors = [];
 
-                        // バリデーション失敗の処理
-                        if(json.errors)
-                        {
-                            console.log(json);
-                            // エラー内容の保存
-                            this.errors = json.errors;
-                            // 編集内容をエラー前に戻す
-                            this.editing_work_time = this.assign_time(this.remember_work_time);
+                        this.work_times = json[0].work_times;
+                        this.total_times = json[0].total_times;
 
-                        }
-                        // バリデーション成功後の処理
-                        else
-                        {
-                            console.log(json);
-                            this.errors = [];
+                        this.editCancel(); //勤怠編集モーダル関係データのリセット
 
-                            this.work_times.splice(this.editing_index,1);
-                            alert(json.comment);
-                        }
-
+                        alert('勤怠情報を更新しました。');
                     })
                     .catch(error => {
                         alert('データの読み込みに失敗しました。');

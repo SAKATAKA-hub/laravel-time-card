@@ -134,7 +134,7 @@ class EditWorkRecordController extends Controller
         ]);
 
 
-        # 更新後の勤務データの取得
+        # JSONデータの取得
         list($user_id, $date) =  [$work_time->employee->user_id,$work_time->date];
 
         //1. JSON勤務データ一覧の取得
@@ -148,33 +148,14 @@ class EditWorkRecordController extends Controller
             'night_hour' => Method::groupTotalTime($time_name='night_hour', $work_times), //総深夜時間(h)
         ];
 
-
-        $comment = '';
+        //3. コメント
+        $comment = 'update OK';
 
         return response()->json([
             compact('comment','work_times', 'total_times')
         ]);
 
 
-
-        // # 出退勤時間の更新
-        // $work_time = WorkTime::find($request->work_time_id)->update([
-        //     'in' => $request->work_time_in,
-        //     'out' => $request->work_time_out,
-        // ]);
-
-        // # 休憩時間の更新
-        // $break_times = BreakTime::where('work_time_id',$request->work_time_id)->get();
-        // for ($i=0; $i < $break_times ->count(); $i++)
-        // {
-        //     $break_times[$i]->update([
-        //         'in' => $request->break_time_in[$i],
-        //         'out' => $request->break_time_out[$i],
-        //     ]);
-        // }
-
-
-        // return redirect()->route('edit_work_record',['date'=>$request->date]);
     }
 
 
@@ -183,22 +164,37 @@ class EditWorkRecordController extends Controller
     /**
      * 勤怠情報の削除(destroy)
      *
-     * @param App\Http\Requests\WorkTimeRecordFormRequest $request
+     * @param App\Http\Requests\WorkTimeRecordFormRequest $request (JSON形式データをPHP配列に変換)
      * @return redirect
     */
     public function destroy(WorkTimeRecordFormRequest $request)
     {
+
+
+        $work_time = WorKTime::find($request->work_time['id']);
+        list($user_id, $date) =  [$work_time->employee->user_id,$work_time->date];
+
+        # 勤務データの削除
+        $work_time->delete();
+
+        # JSONデータの取得
+        //1. JSON勤務データ一覧の取得
+        $work_times =  Method::WorkTimesForJson($user_id,$date);
+
+        //2. 集計時間
+        $total_times = [
+            'restrain_hour' => Method::groupTotalTime($time_name='restrain_hour', $work_times), //総勤務時間(h)
+            'break_hour' => Method::groupTotalTime($time_name='break_hour', $work_times), //総休憩時間(h)
+            'working_hour' => Method::groupTotalTime($time_name='working_hour', $work_times), //総労働時間(h)
+            'night_hour' => Method::groupTotalTime($time_name='night_hour', $work_times), //総深夜時間(h)
+        ];
+
+        //3. コメント
+        $comment = 'update OK';
+
         return response()->json([
-            'comment' => 'destroy OK!',
+            compact('comment','work_times', 'total_times')
         ]);
-
-
-
-        # 出退勤時間の削除
-        // $work_time = WorkTime::find($request->work_time_id)->delete();
-
-
-        // return redirect()->route('edit_work_record',['date'=>$request->date]);
     }
 
 

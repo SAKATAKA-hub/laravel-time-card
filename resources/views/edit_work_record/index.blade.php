@@ -307,7 +307,7 @@
                 <!-- modal-footer -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="editCancel()">閉じる</button>
-                    <button type="button" class="btn btn-primary" @click="updateWorkRecord()">更新</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="updateWorkRecord()">更新</button>
                 </div>
 
 
