@@ -8,8 +8,10 @@
         const route = {
             records_json : document.querySelector('meta[name="route_records_json"]').content,
             validate_input_time : document.querySelector('meta[name="route_validate_input_time"]').content,
-
+            update : document.querySelector('meta[name="route_update"]').content,
+            destroy : document.querySelector('meta[name="route_destroy"]').content,
         };
+
         //param
         const param = {
             user_id :  document.querySelector('meta[name="user_id"]').content,
@@ -22,7 +24,7 @@
 
 
             data : {
-                form_test : true,
+                form_test : false,
 
                 // 表示データ
                 work_times : [],
@@ -63,7 +65,7 @@
                     this.total_times = json.total_times;
 
                     /* --------------------------------------------------------------------------
-                    | 作業用コード
+                    | テスト作業用コード
                     */
                     if(this.form_test){
                         let index = 2;
@@ -79,7 +81,6 @@
                 })
                 .catch(error => {
                     alert('データの読み込みに失敗しました。');
-
                 });
 
 
@@ -141,8 +142,6 @@
                             this.errors = json.errors;
                             // 編集内容をエラー前に戻す
                             this.editing_work_time = this.assign_time(this.remember_work_time);
-
-                            console.log(this.errors.valiWorkTime_in);
                         }
                         // バリデーション成功後の処理
                         else
@@ -150,14 +149,13 @@
                             console.log(json);
                             this.errors = [];
                             this.remember_work_time = this.assign_time(this.editing_work_time);
-
-                            alert('リクエストが成功しました。');
                         }
 
                     })
                     .catch(error => {
+                        // 編集内容をエラー前に戻す
+                        this.editing_work_time = this.assign_time(this.remember_work_time);
                         alert('データの読み込みに失敗しました。');
-
                     });
 
 
@@ -169,6 +167,19 @@
                 deleteBreakRecord : function(b_index){
 
                     console.log(b_index+'休憩時間の削除');
+                    const break_times = this.editing_work_time.break_times;
+
+                    const b_array = [];
+                    for (let index = 0; index < Object.keys(break_times).length; index++) {
+
+                        if(index == b_index){
+                            this.delete_break_times.push(break_times[index]);
+                        }else{
+                            b_array.push(break_times[index]);
+                        }
+                    }
+
+                    this.editing_work_time.break_times = b_array;
                 },
 
                 /*
@@ -176,7 +187,51 @@
                 */
                 updateWorkRecord : function(){
 
-                    console.log(this.editing_index+'勤務時間の更新');
+                    // 非同期通信
+                    fetch( route.update, {
+                        method: 'POST',
+                        body: new URLSearchParams({
+                            _token: token,
+                            _method : 'PATCH',
+                            work_time : JSON.stringify(this.editing_work_time),
+                            delete_break_times : JSON.stringify(this.delete_break_times),
+                        }),
+                    })
+                    .then(response => {
+                        if(!response.ok){ throw new Error(); }
+                        return response.json();
+                    })
+                    .then(json => {
+
+                        // バリデーション失敗の処理
+                        if(json.errors)
+                        {
+                            console.log(json);
+                            // エラー内容の保存
+                            this.errors = json.errors;
+                            // 編集内容をエラー前に戻す
+                            this.editing_work_time = this.assign_time(this.remember_work_time);
+
+                        }
+                        // バリデーション成功後の処理
+                        else
+                        {
+                            console.log(json);
+                            this.errors = [];
+                            this.remember_work_time = this.assign_time(this.editing_work_time);
+                            this.work_times = json[0].work_times;
+                            this.total_times = json[0].total_times;
+
+                            alert('勤怠情報を更新しました。');
+                        }
+
+                    })
+                    .catch(error => {
+                        alert('通信エラーが発生しました。ページを再読み込みします。');
+                        location.reload();
+
+                    });
+
                 },
 
                 /*
@@ -184,7 +239,48 @@
                 */
                 deleteWorkRecord : function(){
 
-                    console.log(this.editing_index+'勤務時間の削除');
+
+                    // 非同期通信
+                    fetch( route.destroy, {
+                        method: 'POST',
+                        body: new URLSearchParams({
+                            _token: token,
+                            _method : 'DELETE',
+                            work_time : JSON.stringify(this.editing_work_time),
+                        }),
+                    })
+                    .then(response => {
+                        if(!response.ok){ throw new Error(); }
+                        return response.json();
+                    })
+                    .then(json => {
+
+                        // バリデーション失敗の処理
+                        if(json.errors)
+                        {
+                            console.log(json);
+                            // エラー内容の保存
+                            this.errors = json.errors;
+                            // 編集内容をエラー前に戻す
+                            this.editing_work_time = this.assign_time(this.remember_work_time);
+
+                        }
+                        // バリデーション成功後の処理
+                        else
+                        {
+                            console.log(json);
+                            this.errors = [];
+
+                            this.work_times.splice(this.editing_index,1);
+                            alert(json.comment);
+                        }
+
+                    })
+                    .catch(error => {
+                        alert('データの読み込みに失敗しました。');
+
+                    });
+
                 },
 
 
@@ -209,7 +305,9 @@
                     const assign_break_times = assign_ob.break_times;
                     const break_times = [];
                     for (let b_index = 0; b_index < Object.keys(assign_break_times).length; b_index++) {
-                        break_times[b_index] = Object.assign( {}, assign_break_times[b_index] );
+                        // break_times[b_index] = Object.assign( {}, assign_break_times[b_index] );
+                        break_times.push( Object.assign({}, assign_break_times[b_index] ) );
+
                     }
 
                     // 休憩時間オブジェクトを勤務時間オブジェクトへ保存

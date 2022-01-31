@@ -31,14 +31,21 @@ class WorkTimeRecordFormRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
+        // dd($this->all());
+
         # JSON形式データを配列形式に変換
         $work_time = json_decode($this->work_time ,true);
         $break_times = $work_time['break_times'];
+        $this->merge([
+            'work_time' => $work_time,
+            'delete_break_times' => json_decode($this->delete_break_times ,true),
+        ]);
+
 
         # 勤務時間のバリデーションデータ
-        $w_in = (int) str_replace(':','',$work_time['input_in']);
-        $w_out = $work_time['input_out']!=='00:00' ? (int) str_replace(':','',$work_time['input_out']) : 2400;
-        $w_max_in = count($break_times) ? $break_times[0]['input_in'] : ( !empty($w_out)? $w_out : 2400 );
+        $w_in = $work_time['input_in'];
+        $w_out = $work_time['input_out']!=='00:00' ? $work_time['input_out'] : '24:00';
+        $w_max_in = count($break_times) ? $break_times[0]['input_in'] : ( !empty($w_out)? $w_out :'24:00' );
         $w_max_out = count($break_times) ?  $break_times[count($break_times)-1]['input_out'] : $w_in;
 
         //文字列(00:00)を数値に変換
@@ -49,26 +56,22 @@ class WorkTimeRecordFormRequest extends FormRequest
             "valiWorkTime_minOut" => empty($w_max_out) ? NULL : (int) str_replace(':','',$w_max_out) ,
         ]);
 
+
         # 休憩時間のバリデーションデータ
         $vali_break_times = [];
         for ($i=0; $i < count($break_times); $i++)
         {
             $break_time = $break_times[$i];
 
-            $b_in = (int) str_replace(':','',$break_time['input_in']);
-            $b_out = $break_time['input_out']!=='00:00' ? (int) str_replace(':','',$break_time['input_out']) : 2400;
-            $b_min_in = (int) str_replace( ':','',
-                $i === 0 ?  $w_in : $break_times[$i -1]['input_out']
-            );
-            $b_max_out = (int) str_replace(':','',
-                $i === count($break_times)-1 ?  $w_out : $break_times[$i +1]['input_in']
-            );
+            $b_in = $break_time['input_in'];
+            $b_out = $break_time['input_out']!=='00:00' ? $break_time['input_out'] : '24:00';
+            $b_max_out = $i === count($break_times)-1 ?  $w_out : $break_times[$i +1]['input_in'];
+
 
             //文字列(00:00)を数値に変換
             $this->merge([
                 'valiBreakTimes_'.$i.'_in' => empty($b_in) ? NULL : (int) str_replace(':','',$b_in) ,
                 'valiBreakTimes_'.$i.'_out' => empty($b_out) ? NULL : (int) str_replace(':','',$b_out) ,
-                'valiBreakTimes_'.$i.'_minIn'=> empty($b_min_in) ? NULL : (int) str_replace(':','',$b_min_in) ,
                 'valiBreakTimes_'.$i.'_maxOut' => empty($b_max_out) ? NULL : (int) str_replace(':','',$b_max_out) ,
             ]);
         }
@@ -87,35 +90,22 @@ class WorkTimeRecordFormRequest extends FormRequest
     public function rules()
     {
         // dd($this->all());
-        // dd($this['valiWorkTime_minOut']<$this['valiWorkTime_out']);
-
-
 
         # 出勤ルール
         $rules = [
             'valiWorkTime_in' => [
-                'required',
+                // 'required',
                 'lt:'.$this['valiWorkTime_maxIn'],
             ],
-            'valiWorkTime_out' =>[
-                'gt:'.$this['valiWorkTime_minOut'],
-            ]
         ];
-
-        // ルールの削除：退勤入力がまだのとき
-        if( empty($this['valiWorkTime_out']) ){ $rules['valiWorkTime_out'] = [];}
-
 
         # 休憩ルールの追加
         for ($i=0; $i < $this['breakTimesCount']; $i++)
         {
             $rules['valiBreakTimes_'.$i.'_in'] = [
-                'required',
-                'gt:'.$this['valiBreakTimes_'.$i.'_minIn'],
                 'lt:'.$this['valiBreakTimes_'.$i.'_out']
             ];
             $rules['valiBreakTimes_'.$i.'_out'] = [
-                'required',
                 'lt:'.$this['valiBreakTimes_'.$i.'_maxOut']
             ];
 
@@ -123,8 +113,8 @@ class WorkTimeRecordFormRequest extends FormRequest
             if( empty($this['valiBreakTimes_'.$i.'_maxOut']) ){
                 $rules['valiBreakTimes_'.$i.'_out'] = [];
             }
-
         }
+
 
         return $rules;
     }
@@ -141,9 +131,7 @@ class WorkTimeRecordFormRequest extends FormRequest
     {
         # 基本メッセージ
         $messages = [
-            'valiWorkTime_in.required' => '出勤時間の入力は必須です。',
-            'valiWorkTime_in.lt' => '出勤時間は退勤時間より前の時間を入力してください。',
-            'valiWorkTime_out.gt' => '退勤時間は出勤時間より後の時間を入力してください。',
+            'valiWorkTime_in.lt' => '出勤が退勤より前の時間になるよう、入力してください。',
         ];
 
 
@@ -151,23 +139,16 @@ class WorkTimeRecordFormRequest extends FormRequest
         $b_count = $this['breakTimesCount'];
         if($b_count)
         {
-            $messages['valiWorkTime_in.lt'] = '出勤時間は休憩開始時間1より前の時間を入力してください。';
-            $messages['valiWorkTime_out.gt'] = '退勤時間は休憩終了時間'.$b_count.'より後の時間を入力してください。';
+            $messages['valiWorkTime_in.lt'] = '出勤が休憩開始1より前の時間になるよう、入力してください。';
         }
 
-        for ($i=0; $i < $this['breakTimesCount']; $i++)
+        for ($i=0; $i < $b_count; $i++)
         {
-            $messages["valiBreakTimes_".$i."_in.required"] = '休憩開始時間'.$b_count.'の入力は必須です。';
-            $messages["valiBreakTimes_".$i."_in.gt"] = $i === 0 ?
-                '休憩開始時間1は、出勤時間より後の時間を入力してください。' :
-                '休憩開始時間'.($i +1).'は、休憩終了時間時間'.$i.'より後の時間を入力してください。' ;
-            $messages["valiBreakTimes_".$i."_in.lt"] = '休憩開始時間'.($i +1).'は、休憩終了時間'.($i +1).'より後の時間を入力して下さい。';
-            $messages["valiBreakTimes_".$i."_out.required"] = '休憩終了時間'.$b_count.'の入力は必須です。';
+            $messages["valiBreakTimes_".$i."_in.lt"] = '休憩開始'.($i +1).'が休憩終了'.($i +1).'より前の時間になるよう、入力して下さい。';
             $messages["valiBreakTimes_".$i."_out.lt"] = $i === $b_count-1 ?
-                '休憩終了時間'.($i +1).'は、退勤時間より前の時間を入力してください。' :
-                '休憩終了時間'.($i +1).'は、休憩開始時間'.($i +2).'より前の時間を入力してください。' ;
+                '休憩終了'.($i +1).'が退勤より前の時間になるよう、入力してください。' :
+                '休憩終了'.($i +1).'が休憩開始'.($i +2).'より前の時間になるよう、入力してください。' ;
         }
-
 
         return $messages;
     }
@@ -182,7 +163,6 @@ class WorkTimeRecordFormRequest extends FormRequest
      */
     protected function failedValidation(Validator $validator)
     {
-
         $response = response()->json([
             'errors' => $validator->errors(),
         ]);

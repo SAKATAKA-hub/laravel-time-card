@@ -30,6 +30,8 @@
     <!-- route -->
     <meta name="route_records_json" content="{{route('edit_work_record.records_json')}}">
     <meta name="route_validate_input_time" content="{{route('edit_work_record.validate_input_time')}}">
+    <meta name="route_update" content="{{route('edit_work_record.update')}}">
+    <meta name="route_destroy" content="{{route('edit_work_record.destroy')}}">
 
     <!-- param -->
     <meta name="user_id" content="{{$user_id}}">
@@ -235,7 +237,7 @@
                                     <label class="me-2">退勤</label>
                                 </div>
                                 <div class="col-auto">
-                                    <input class="form-control" type="time" v-model="editing_work_time.input_out" @change="changeWorkTime">
+                                    <input class="form-control" type="time" v-model="editing_work_time.input_out" @blur="changeWorkTime">
                                 </div>
                                 <div class="col-auto">
                                     <span style="cursor:pointer;" @click="deleteInput(null)"><i class="bi bi-file-x fs-2 text-secondary"></i></span>
@@ -288,7 +290,7 @@
                             <h5>エラーメッセージ</h5>
                             <ul>
                                 <li v-if="errors.valiWorkTime_in">@{{errors.valiWorkTime_in}}</li>
-                                <li v-if="errors['valiWorkTime_out']">@{{valiWorkTime_out}}</li>
+                                <li v-if="errors.valiWorkTime_out">@{{errors.valiWorkTime_out}}</li>
                             </ul>
                             <ul v-for="(break_time, i) in editing_work_time.break_times">
                                 <li v-if="errors['valiBreakTimes_'+i+'_in']">@{{errors['valiBreakTimes_'+i+'_in']}}</li>
@@ -305,7 +307,7 @@
                 <!-- modal-footer -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="editCancel()">閉じる</button>
-                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">更新</button>
+                    <button type="button" class="btn btn-primary" @click="updateWorkRecord()">更新</button>
                 </div>
 
 
@@ -335,7 +337,7 @@
                 <!-- modal-footer -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="editCancel()">閉じる</button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">削除</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="deleteWorkRecord()">削除</button>
                 </div>
 
             </div>

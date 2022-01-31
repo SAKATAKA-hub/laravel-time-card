@@ -55,15 +55,11 @@ class EditWorkRecordController extends Controller
         list($user_id, $date) =  [$request->user_id,$request->date];
 
 
-        # (ユーザーに紐づく)従業員と日付を指定した、勤務データの取得
-        $work_times =
-        WorkTime::employees($user_id)->where('date',$date)->orderBy('in','asc')->get();
-
-        # JSON送信用にデータを加工
-        $work_times = $work_times->count()? Method::WorkTimesForJson($work_times) : $work_times;
+        // JSON勤務データ一覧の取得
+        $work_times =  Method::WorkTimesForJson($user_id,$date);
 
 
-        # 集計時間
+        // 集計時間
         $total_times = [
             'restrain_hour' => Method::groupTotalTime($time_name='restrain_hour', $work_times), //総勤務時間(h)
             'break_hour' => Method::groupTotalTime($time_name='break_hour', $work_times), //総休憩時間(h)
@@ -87,12 +83,10 @@ class EditWorkRecordController extends Controller
     */
     public function validate_input_time(WorkTimeRecordFormRequest $request)
     {
-        // dd($request->work_time);
         $work_time = $request->work_time;
 
         return response()->json([
             'comment' => 'validation OK!',
-            'work_time' => $work_time,
         ]);
     }
 
@@ -101,49 +95,110 @@ class EditWorkRecordController extends Controller
 
 
     /**
-     * 勤怠情報の修正(update_work_record)
+     * 勤怠情報の更新(update)
      *
-     * @param \Illuminate\Http\Request $request
+     * @param App\Http\Requests\WorkTimeRecordFormRequest $request
      * @return redirect
     */
-    public function update_work_record(Request $request)
+    public function update(WorkTimeRecordFormRequest $request)
     {
-        # 出退勤時間の更新
-        $work_time = WorkTime::find($request->work_time_id)->update([
-            'in' => $request->work_time_in,
-            'out' => $request->work_time_out,
-        ]);
 
-        # 休憩時間の更新
-        $break_times = BreakTime::where('work_time_id',$request->work_time_id)->get();
-        for ($i=0; $i < $break_times ->count(); $i++)
+        // dd($request->all());
+        // dd($work_time);
+
+        # データの更新処理
+        //1. 休憩データの更新
+        for ($i=0; $i < count($request->work_time["break_times"]); $i++)
         {
-            $break_times[$i]->update([
-                'in' => $request->break_time_in[$i],
-                'out' => $request->break_time_out[$i],
+            $break_time = $request->work_time["break_times"][$i];
+            BreakTime::find($break_time['id'])->update([
+                'in' => $break_time['input_in'].':00',
+                'out' => $break_time['input_out'].':00',
             ]);
+
+        }
+
+        //2. 休憩データの削除
+        for ($i=0; $i < count($request->delete_break_times); $i++)
+        {
+            $break_time = $request->delete_break_times[$i];
+            BreakTime::find($break_time['id'])->delete();
         }
 
 
-        return redirect()->route('edit_work_record',['date'=>$request->date]);
+        //3. 勤務データの更新
+        $work_time = WorKTime::find($request->work_time['id']);
+        $work_time->update([
+            'in' => $request->work_time['input_in'].':00',
+            'out' => $request->work_time['input_out'].':00',
+        ]);
+
+
+        # 更新後の勤務データの取得
+        list($user_id, $date) =  [$work_time->employee->user_id,$work_time->date];
+
+        //1. JSON勤務データ一覧の取得
+        $work_times =  Method::WorkTimesForJson($user_id,$date);
+
+        //2. 集計時間
+        $total_times = [
+            'restrain_hour' => Method::groupTotalTime($time_name='restrain_hour', $work_times), //総勤務時間(h)
+            'break_hour' => Method::groupTotalTime($time_name='break_hour', $work_times), //総休憩時間(h)
+            'working_hour' => Method::groupTotalTime($time_name='working_hour', $work_times), //総労働時間(h)
+            'night_hour' => Method::groupTotalTime($time_name='night_hour', $work_times), //総深夜時間(h)
+        ];
+
+
+        $comment = '';
+
+        return response()->json([
+            compact('comment','work_times', 'total_times')
+        ]);
+
+
+
+        // # 出退勤時間の更新
+        // $work_time = WorkTime::find($request->work_time_id)->update([
+        //     'in' => $request->work_time_in,
+        //     'out' => $request->work_time_out,
+        // ]);
+
+        // # 休憩時間の更新
+        // $break_times = BreakTime::where('work_time_id',$request->work_time_id)->get();
+        // for ($i=0; $i < $break_times ->count(); $i++)
+        // {
+        //     $break_times[$i]->update([
+        //         'in' => $request->break_time_in[$i],
+        //         'out' => $request->break_time_out[$i],
+        //     ]);
+        // }
+
+
+        // return redirect()->route('edit_work_record',['date'=>$request->date]);
     }
 
 
 
 
     /**
-     * 勤怠情報の削除(destroy_work_record)
+     * 勤怠情報の削除(destroy)
      *
-     * @param \Illuminate\Http\Request $request
+     * @param App\Http\Requests\WorkTimeRecordFormRequest $request
      * @return redirect
     */
-    public function destroy_work_record(Request $request)
+    public function destroy(WorkTimeRecordFormRequest $request)
     {
+        return response()->json([
+            'comment' => 'destroy OK!',
+        ]);
+
+
+
         # 出退勤時間の削除
-        $work_time = WorkTime::find($request->work_time_id)->delete();
+        // $work_time = WorkTime::find($request->work_time_id)->delete();
 
 
-        return redirect()->route('edit_work_record',['date'=>$request->date]);
+        // return redirect()->route('edit_work_record',['date'=>$request->date]);
     }
 
 
@@ -155,14 +210,14 @@ class EditWorkRecordController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return redirect
     */
-    public function destroy_break_record(Request $request)
-    {
-        # 休憩時間の削除
-        $break_time = BreakTime::find($request->break_time_id)->delete();
+    // public function destroy_break_record(Request $request)
+    // {
+    //     # 休憩時間の削除
+    //     $break_time = BreakTime::find($request->break_time_id)->delete();
 
 
-        return redirect()->route('edit_work_record',['date'=>$request->date]);
-    }
+    //     return redirect()->route('edit_work_record',['date'=>$request->date]);
+    // }
 
 
 

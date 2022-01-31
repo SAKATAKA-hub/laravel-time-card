@@ -103,14 +103,10 @@ Route::post('edit_work_record/validate_input_time', [EditWorkRecordController::c
 ->name('edit_work_record.validate_input_time');
 
 
-# 勤怠情報の修正(update_work_record)
-Route::patch('update_work_record', [EditWorkRecordController::class,'update_work_record'])
-->name('update_work_record');
+# 勤怠情報の更新(update)
+Route::patch('edit_work_record/update', [EditWorkRecordController::class,'update'])
+->name('edit_work_record.update');
 
-# 勤怠情報の削除(destroy_work_record)
-Route::delete('destroy_work_record', [EditWorkRecordController::class,'destroy_work_record'])
-->name('destroy_work_record');
-
-# 休憩の削除(destroy_break_record) ※のちほど修正に含む
-Route::delete('destroy_break_record', [EditWorkRecordController::class,'destroy_break_record'])
-->name('destroy_break_record');
+# 勤怠情報の削除(destroy)
+Route::delete('edit_work_record/destroy', [EditWorkRecordController::class,'destroy'])
+->name('edit_work_record.destroy');
