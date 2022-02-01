@@ -134,8 +134,8 @@ Route::middleware(['auth'])->group(function ()
 | 勤怠修正
 |---------------------------------------- |
 */
-// Route::middleware(['auth'])->group(function ()
-// {
+Route::middleware(['auth'])->middleware(['delete_easy_user'])->group(function ()
+{
 
     # 勤怠修正ページの表示(edit_work_record)
     Route::get('edit_work_record', [EditWorkRecordController::class,'index'])
@@ -159,4 +159,4 @@ Route::middleware(['auth'])->group(function ()
     Route::delete('edit_work_record/destroy', [EditWorkRecordController::class,'destroy'])
     ->name('edit_work_record.destroy');
 
-// });
+});

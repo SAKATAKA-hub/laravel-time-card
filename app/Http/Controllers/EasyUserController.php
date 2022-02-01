@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 
 use App\Models\User;
 use App\Models\Employee;
@@ -19,38 +20,48 @@ use Database\Seeders\WorkRecordStatusSeeder;
 
 class EasyUserController extends Controller
 {
-    public function create_easy_user()
+    public function create_easy_user(Request $request)
     {
-        # フェイクデータの作成
-        WorkRecordStatusSeeder::run();
-
-        # シーダーの利用
-        $user = User::orderBy('id','desc')->first();
-
-        dd($user->employees);
-
-
-
+        \Database\Seeders\WorkRecordForTestSeeder::run();
 
 
 
         # フェイクデータの作成
-        WorkRecordStatusSeeder::run();
-
-        # シーダーの利用
-        $user = User::orderBy('id','desc')->first();
+        // WorkRecordStatusSeeder::run();
 
         # 作成データの加工
+        $user = User::orderBy('id','desc')->first();
         $now = Carbon::parse('now');
-        $email = $now->format('YmdHis').'@mail.co.jp';
+        $email = $now->format('Y/m/d/H:i:s').'@mail.co.jp';
 
         $user->update([
-            'name' => '簡単ログイン登録',
+            'name' => 'ワンタイムユーザー',
             'email' => $email,
             'easy_user' => 1,
         ]);
 
 
-        dd($user);
+
+        # セッションの削除
+        Auth::logout(); //ユーザーセッションの削除
+        $request->session()->invalidate(); //全セッションの削除
+        $request->session()->regenerateToken(); //セッションの再作成(二重送信の防止)
+
+
+        # ログイン処理
+        $credentials = [
+            'email' => $email,
+            'password' => 'password',
+        ];
+        if (Auth::attempt($credentials))
+        {
+            $request->session()->regenerate();
+            return redirect()->route('date_list');
+        }
+
+        // ログイン失敗の処理
+        return back();
+
+
     }
 }

@@ -4,12 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Http\Requests\RegisterFormRequest;
 use App\Http\Requests\EditRegisterFormRequest;
-
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 use App\Models\User;
 
@@ -29,10 +28,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) { //ログイン成功のチェック
 
-            $user = Auth::user()->id;
-
             $request->session()->regenerate(); //ユーザー情報をセッションに保存
-
 
             return redirect()->route('date_list');
         }
