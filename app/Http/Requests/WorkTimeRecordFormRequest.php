@@ -89,7 +89,6 @@ class WorkTimeRecordFormRequest extends FormRequest
      */
     public function rules()
     {
-        // dd($this->all());
 
         # 出勤ルール
         $rules = [
@@ -163,6 +162,7 @@ class WorkTimeRecordFormRequest extends FormRequest
      */
     protected function failedValidation(Validator $validator)
     {
+
         $response = response()->json([
             'errors' => $validator->errors(),
         ]);

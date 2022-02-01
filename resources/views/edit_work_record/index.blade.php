@@ -289,12 +289,12 @@
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <h5>エラーメッセージ</h5>
                             <ul>
-                                <li v-if="errors.valiWorkTime_in">@{{errors.valiWorkTime_in}}</li>
-                                <li v-if="errors.valiWorkTime_out">@{{errors.valiWorkTime_out}}</li>
+                                <li v-if="errors.valiWorkTime_in">@{{errors.valiWorkTime_in[0]}}</li>
+                                <li v-if="errors['valiWorkTime_out']">@{{valiWorkTime_out[0]}}</li>
                             </ul>
                             <ul v-for="(break_time, i) in editing_work_time.break_times">
-                                <li v-if="errors['valiBreakTimes_'+i+'_in']">@{{errors['valiBreakTimes_'+i+'_in']}}</li>
-                                <li v-if="errors['valiBreakTimes_'+i+'_out']">@{{errors['valiBreakTimes_'+i+'_out']}}</li>
+                                <li v-if="errors['valiBreakTimes_'+i+'_in']">@{{errors['valiBreakTimes_'+i+'_in'][0]}}</li>
+                                <li v-if="errors['valiBreakTimes_'+i+'_out']">@{{errors['valiBreakTimes_'+i+'_out'][0]}}</li>
                             </ul>
                         </div>
                     </div>

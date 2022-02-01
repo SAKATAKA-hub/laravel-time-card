@@ -8,7 +8,9 @@ use App\Http\Requests\WorkTimeRecordFormRequest;
 use App\Models\WorkTime;
 use App\Models\BreakTime;
 use App\Models\Employee;
+
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 
 class EditWorkRecordController extends Controller
@@ -22,7 +24,7 @@ class EditWorkRecordController extends Controller
     public function index(Request $request)
     {
         # ユーザーID
-        $user_id = 1;
+        $user_id = Auth::user()->id;
 
 
         # 日付の指定

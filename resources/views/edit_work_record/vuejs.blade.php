@@ -24,7 +24,7 @@
 
 
             data : {
-                form_test : false,
+                form_test : true,
 
                 // 表示データ
                 work_times : [],

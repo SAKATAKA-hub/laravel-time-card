@@ -10,6 +10,7 @@ class NavMenuComposer
 
     public function compose(View $view)
     {
+        // dd($view->rote_name);
 
         # ナビメニューに表示するリンクデータ
         $links = [

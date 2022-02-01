@@ -3,15 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
 use App\Models\WorkTime;
 use App\Models\BreakTime;
 use App\Models\Employee;
-use Carbon\Carbon;
+use App\Models\User;
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class WorkRecordListController extends Controller
 {
-
     /**
      * 日別勤怠管理表ページの表示(date_list)
      *
@@ -21,7 +23,7 @@ class WorkRecordListController extends Controller
     public function date_list(Request $request)
     {
         # ユーザーID
-        $user_id = 1;
+        $user_id = Auth::user()->id;
 
         # 日付の指定
         // 日付指定のリクエストが無ければ、今日の日付
@@ -66,8 +68,7 @@ class WorkRecordListController extends Controller
     public function month_list(Request $request)
     {
         # ユーザーID
-        $user_id = 1;
-
+        $user_id = Auth::user()->id;
 
         # 日付の指定
         // 日付のリクエストが無ければ、今日の日付
@@ -142,7 +143,7 @@ class WorkRecordListController extends Controller
     public function parsonal_list(Request $request)
     {
         # ユーザーID
-        $user_id = 1;
+        $user_id = Auth::user()->id;
 
         # 日付の指定
         // 日付のリクエストが無ければ、今日の日付
