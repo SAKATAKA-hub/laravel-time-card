@@ -78,6 +78,7 @@ Route::post('post_register',[AuthController::class,'post_register'])
 ->name('post_register');
 
 
+# ログイン中のみ表示(auth)
 Route::middleware(['auth'])->group(function ()
 {
 
@@ -103,14 +104,19 @@ Route::middleware(['auth'])->group(function ()
 | 勤怠管理表ページの表示
 |---------------------------------------- |
 */
-Route::middleware(['auth'])->group(function ()
+# ログイン中のみ表示(auth)、24時間経過したワンタイムユーザーの削除
+Route::middleware(['auth'])->middleware(['delete_easy_user'])->group(function ()
 {
 
-    # タイムカードページの表示
-    Route::get('time_card', function () {
-        return view('time_card');
-    })
+    # タイムカードページの表示(index)
+    Route::get('time_card', [InputWorkRecordController::class,'index'])
     ->name('time_card');
+
+
+
+
+
+
 
     # 日別勤怠管理表ページの表示(date_list)
     Route::get('date_list', [WorkRecordListController::class,'date_list'])
@@ -134,6 +140,7 @@ Route::middleware(['auth'])->group(function ()
 | 勤怠修正
 |---------------------------------------- |
 */
+# ログイン中のみ表示(auth)、24時間経過したワンタイムユーザーの削除
 Route::middleware(['auth'])->middleware(['delete_easy_user'])->group(function ()
 {
 

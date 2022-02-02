@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"  class="bg-secondary">
 <head>
     <!-- Required meta tags -->
         <meta charset="UTF-8">
@@ -28,24 +28,24 @@
             }
 
 
-
             main{
-                min-height: 100vh;
+                min-height: 80vh;
+                max-width: 100vw;
             }
 
             .main_container{
-                max-width: 100%;
+                width: 100%;
                 padding: 1rem ;
             }
             .main_container .table_container{
                 max-width: 100%;
-                margin: 0 auto;
                 box-sizing: border-box;
                 overflow:scroll;
                 white-space:nowrap;
             }
             .main_container .table_container table{
                 border:1px solid #ddd;
+                margin: 0 auto;
             }
 
         </style>

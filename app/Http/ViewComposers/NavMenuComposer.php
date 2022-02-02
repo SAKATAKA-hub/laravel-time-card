@@ -12,6 +12,7 @@ class NavMenuComposer
     {
         // dd($view->rote_name);
 
+
         # ナビメニューに表示するリンクデータ
         $links = [
             'time_card' =>

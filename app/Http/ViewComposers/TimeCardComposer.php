@@ -4,13 +4,13 @@ namespace App\Http\ViewComposers;
 use Illuminate\View\View;
 
 
-class DateListComposer
+class TimeCardComposer
 {
 
     public function compose(View $view)
     {
         # viewに変数を追加
-        $view->with(['rote_name' => 'date_list']);
+        $view->with(['rote_name' => 'time_card']);
     }
 
 }
