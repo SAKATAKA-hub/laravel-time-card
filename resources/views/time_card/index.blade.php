@@ -20,27 +20,39 @@
 
 {{-- styleタグ --}}
 @section('style')
+    <!-- token -->
+    <meta name="token" content="{{ csrf_token() }}">
+    <!-- route -->
+    <meta name="route_employeees_json" content="{{route('time_card.employeees_json')}}">
+    <!-- param -->
+    <meta name="user_id" content="{{$user_id}}">
+
     <style>
         main #showTime{
-            display: flex;
-            align-items: center;
+            /* display: flex;
+            align-items: center; */
 
-            height: 3rem;
+            /* height: 3rem; */
+            text-align: center;
             font-weight: bold;
-            font-size: 1.5rem;
         }
         main #showTime #nowDay{
-            font-size: 1.5rem;
+            font-size: 1.0rem;
         }
         main  #showTime #nowAmPm{
-            margin-left: 1rem;
+            display: inline;
+            margin-left: 1.5rem;
+            font-size: 1.5rem;
         }
         main #showTime #nowTime{
+            display: inline;
             margin-left: .5rem;
-            font-size: 2.25rem;
+            font-size: 3rem;
         }
         main #showTime #nowSec{
+            display: inline;
             margin-left: .5rem;
+            font-size: 1.5rem;
         }
 
 
@@ -69,39 +81,10 @@
 {{-- scriptタグ --}}
 @section('script')
 
-    <script>
-        'use strict';
+    <!-- Vue.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
 
-        function showTime()
-        {
-            const now = new Date();
-            const nowYear = now.getFullYear();
-            const nowMonth = String(now.getMonth()+1).padStart(2,'0');
-            const nowDate = String(now.getDate()).padStart(2,'0');
-            const nowHour = String(now.getHours()).padStart(2,'0');
-            const nowMin = String(now.getMinutes()).padStart(2,'0');
-            const nowSec = String(now.getSeconds()).padStart(2,'0');
-            const dayNum = String(now.getUTCDay());
-
-            const DayArry =["(日)","(月)","(火)","(水)","(木)","(金)","(土)"];
-
-            let ampm = "";
-            if(nowHour<12){ampm = "AM";}
-            else{ampm = "PM";}
-
-            document.getElementById('nowDay').textContent = `${nowYear}年${nowMonth}月${nowDate}日${DayArry[dayNum]}`;
-            document.getElementById('nowAmPm').textContent = ampm;
-            document.getElementById('nowTime').textContent = `${nowHour % 12}:${nowMin}`;
-            document.getElementById('nowSec').textContent = `:${nowSec}`;
-
-
-            refresh();
-        }
-        function refresh(){setTimeout(showTime,1000);}
-        showTime();
-
-    </script>
-
+    @include('time_card.vuejs')
 
 @endsection
 
@@ -110,82 +93,119 @@
 
 {{-- メインコンテンツ --}}
 @section('main_content')
-    <!--現在時刻の表示領域-->
-    <div id="showTime" class="mb-3">
-        <div id="nowDay"></div>
-        <div id="nowAmPm"></div>
-        <div id="nowTime"></div>
-        <div id="nowSec"></div>
-    </div>
+
+    <div v-show="form_test">
+        <div class="mb-3 p-3 bg-white">
+            <h3 class="border-bottom mb-3">JSONテスト</h3>
+
+            <ul>
+                <li>
+                    <h5 class="d-inline">従業員基本JSONデータの取得</h5>
+                    <form action="{{route('time_card.employeees_json')}}" method="POST" class="d-inline">
+                        @csrf
+                        <input type="hidden" name="user_id" value="{{$user_id}}">
+                        <button>実行</button>
+                    </form>
+                </li>
+
+            </ul>
 
 
-    <!-- alert -->
-    <div class="">
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            おはようございます。<br>今日も一日がんばりましょう！
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            おはようございます。<br>今日も一日がんばりましょう！
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            今日も一日おつかれさまでした！
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     </div>
 
 
     <div class="d-md-flex">
-        <section class="mb-5">
-            <ul class="list-group mb-5 w-md-100">
-                <li class="list-group-item list-group-item-action list-group-item-primary">
-                    <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
-                        style="background-color:pink; border:5px solid pink;" width="30" height="30"
-                    >
-                    <p class="d-inline ms-2">A disabled item</p>
-                    <p class="d-inline ms-5 me-5 fw-bold">出勤中</p>
-                </li>
-                <li class="list-group-item list-group-item-action">
-                    <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
-                        style="background-color:pink; border:5px solid pink;" width="30" height="30"
-                    >
-                    <p class="d-inline ms-2">A disabled item</p>
-                    <p class="d-inline ms-5 me-5 fw-bold">出勤中</p>
-                </li>
-                <li class="list-group-item list-group-item-action">
-                    <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
-                        style="background-color:pink; border:5px solid pink;" width="30" height="30"
-                    >
-                    <p class="d-inline ms-2">A disabled item</p>
-                    <p class="d-inline ms-5 me-5 fw-bold">出勤中</p>
-                </li>
-                <li class="list-group-item list-group-item-action">
-                    <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
-                        style="background-color:pink; border:5px solid pink;" width="30" height="30"
-                    >
-                    <p class="d-inline ms-2">A disabled item</p>
-                    <p class="d-inline ms-5 me-5 fw-bold">出勤中</p>
-                </li>
-                <li class="list-group-item list-group-item-action">
-                    <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
-                        style="background-color:pink; border:5px solid pink;" width="30" height="30"
-                    >
-                    <p class="d-inline ms-2">A disabled item</p>
-                    <p class="d-inline ms-5 me-5 fw-bold">出勤中</p>
-                </li>
-                </ul>
-        </section>
-
-
-
         <section class="mb-5" style="flex:1;">
+
+            <!-- alert -->
+            <div class="ms-3 me-3">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    おはようございます。<br>今日も一日がんばりましょう！
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                {{-- <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    おはようございます。<br>今日も一日がんばりましょう！
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div> --}}
+
+                {{-- <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    今日も一日おつかれさまでした！
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div> --}}
+            </div>
+
+            <!--現在時刻の表示領域-->
+            <div id="showTime" class="mb-3">
+                <div id="nowDay"></div>
+                <div id="nowAmPm"></div>
+                <div id="nowTime"></div>
+                <div id="nowSec"></div>
+            </div>
+
             <div class="time_card_container">
 
-                <div class="card" style="min-height:23rem;">
+                <!-- v-if 従業員選択中 -->
+                <div class="card" style="min-height:23rem;"
+                 v-if="Object.keys(active_employee).length"
+                >
+                    <div class="border-bottom" style="height:3rem; line-height:3rem;">
+                        <h4 class="fw-bold">@{{active_employee.name}}</h4>
+                    </div>
 
-                    <!-- Work State -->
-                    <div class="border-bottom">
+                    <div class="card-body">
+
+                        <div>
+                            <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
+                             v-if="active_employee.work_status===0"
+                             style="background-color:#6c757d; border:16px solid #6c757d;" width="100" height="100"
+                            >
+                            <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
+                             v-else
+                             :style=" 'background-color:'+active_employee.color+'; border:16px solid '+active_employee.color+';' "
+                             width="100" height="100"
+                            >
+                        </div>
+
+                        <div>
+                            <h4 class="fw-bold text-secondary" v-if="active_employee.work_status===0">退勤中</h4>
+                            <h4 class="fw-bold text-success" v-if="active_employee.work_status===1">出勤中</h4>
+                            <h4 class="fw-bold text-warning" v-if="active_employee.work_status===2">休憩中</h4>
+                        </div>
+
+                        <!-- button -->
+                        <div class="d-grid gap-2 mt-3">
+                            <button class="btn btn-outline-success btn-lg" type="button" v-if="active_employee.work_status===0">勤務開始</button>
+                            <button class="btn btn-outline-warning btn-lg" type="button" v-if="active_employee.work_status===1">休憩開始開始</button>
+                            <button class="btn btn-outline-warning btn-lg" type="button"  v-if="active_employee.work_status===2">休憩終了</button>
+                            <button class="btn btn-outline-danger btn-lg" type="button" v-if="active_employee.work_status===1">勤務終了</button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- v-else 従業員が選択されていない -->
+                <div class="card" style="min-height:23rem;" v-else>
+                    <div class="border-bottom" style="height:3rem; line-height:3rem;">
+                    </div>
+
+                    <div class="card-body">
+                        <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
+                         style="background-color:#6c757d; border:16px solid #6c757d;" width="100" height="100"
+                        >
+                        <div>
+                            <h4 class="fw-bold text-secondary">従業員を選択してください</h4>
+                        </div>
+                    </div>
+
+                </div>
+
+                {{-- <div class="card" style="min-height:23rem;">
+
+                    <div class="border-bottom" style="height:3rem; line-height:3rem;">
                         <h4 class="fw-bold text-secondary">従業員を選択してください</h4>
                     </div>
 
@@ -195,23 +215,48 @@
                         >
 
                         <div>
-                            {{-- <h4 class="fw-bold text-success">出勤中</h4> --}}
-                            {{-- <h4 class="fw-bold text-warning">休憩中</h4> --}}
-                            <h4 class="fw-bold text-success">退勤中</h4>
+                            <h4 class="fw-bold text-success">出勤中</h4>
+                            <h4 class="fw-bold text-warning">休憩中</h4>
+                            <h4 class="fw-bold text-secondary">退勤中</h4>
                         </div>
 
                         <!-- button -->
                         <div class="d-grid gap-2 mt-3">
-                            {{-- <button class="btn btn-outline-success btn-lg" type="button">勤務開始</button>
-                            <button class="btn btn-outline-warning btn-lg" type="button">休憩開始開始</button> --}}
+                            <button class="btn btn-outline-success btn-lg" type="button">勤務開始</button>
+                            <button class="btn btn-outline-warning btn-lg" type="button">休憩開始開始</button>
                             <button class="btn btn-outline-warning btn-lg" type="button">休憩終了</button>
                             <button class="btn btn-outline-danger btn-lg" type="button">勤務終了</button>
                         </div>
 
                     </div>
-                </div>
+                </div> --}}
 
             </div>
+        </section>
+
+
+
+        <section class="mb-5">
+            <ul class="list-group mb-5 w-md-100">
+
+                <li class="list-group-item list-group-item-action"
+                 v-for="(employee, e_index) in employees"
+                 @click="selectEmployee(e_index)"
+                >
+                    <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
+                     :style=" 'background-color:'+employee.color+'; border:5px solid '+employee.color+';' "
+                     width="30" height="30"
+                    >
+
+                    <p class="d-inline ms-2">@{{employee.name}}</p>
+                    <p class="d-inline ms-2">@{{employee.color}}</p>
+
+                    <p v-if="employee.work_status === 0" class="d-inline ms-5 me-5 fw-bold text-secondary">退勤中</p>
+                    <p v-if="employee.work_status === 1" class="d-inline ms-5 me-5 fw-bold text-success">出勤中</p>
+                    <p v-if="employee.work_status === 2" class="d-inline ms-5 me-5 fw-bold text-warning">休憩中</p>
+                </li>
+
+            </ul>
         </section>
     </div>
 @endsection
