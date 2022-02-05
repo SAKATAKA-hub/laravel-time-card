@@ -24,6 +24,11 @@
     <meta name="token" content="{{ csrf_token() }}">
     <!-- route -->
     <meta name="route_employeees_json" content="{{route('time_card.employeees_json')}}">
+    <meta name="route_work_in" content="{{route('time_card.work_in')}}">
+    <meta name="route_break_in" content="{{route('time_card.break_in')}}">
+    <meta name="route_break_out" content="{{route('time_card.break_out')}}">
+    <meta name="route_work_out" content="{{route('time_card.work_out')}}">
+
     <!-- param -->
     <meta name="user_id" content="{{$user_id}}">
 
@@ -67,9 +72,13 @@
             line-height:3rem;
         }
 
-        main  .time_card_container .card{
+        main .time_card_container .card{
             border-radius: 0.5em;
             box-shadow: 0 2px 10px rgb(0 0 0 / 40%);
+        }
+        main .time_card_container .card .card-body{
+            border-radius: 0 0 0.5em 0.5em;
+            background: #fff;
         }
     </style>
 @endsection
@@ -149,37 +158,54 @@
                 <!-- v-if 従業員選択中 -->
                 <div class="card" style="min-height:23rem;"
                  v-if="Object.keys(active_employee).length"
+                 :class="{
+                    'bg-secondary':active_employee.work_status===0,
+                    'bg-success':active_employee.work_status===1,
+                    'bg-warning':active_employee.work_status===2,
+                 }"
                 >
                     <div class="border-bottom" style="height:3rem; line-height:3rem;">
-                        <h4 class="fw-bold">@{{active_employee.name}}</h4>
+                        <h4 class="fw-bold text-light" v-if="active_employee.work_status===0">退勤中</h4>
+                        <h4 class="fw-bold text-light" v-if="active_employee.work_status===1">出勤中</h4>
+                        <h4 class="fw-bold" v-if="active_employee.work_status===2">休憩中</h4>
                     </div>
 
                     <div class="card-body">
 
                         <div>
-                            <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
+                            {{-- <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
                              v-if="active_employee.work_status===0"
                              style="background-color:#6c757d; border:16px solid #6c757d;" width="100" height="100"
-                            >
+                            > --}}
                             <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
-                             v-else
+                             {{-- v-else --}}
                              :style=" 'background-color:'+active_employee.color+'; border:16px solid '+active_employee.color+';' "
                              width="100" height="100"
                             >
                         </div>
 
                         <div>
-                            <h4 class="fw-bold text-secondary" v-if="active_employee.work_status===0">退勤中</h4>
-                            <h4 class="fw-bold text-success" v-if="active_employee.work_status===1">出勤中</h4>
-                            <h4 class="fw-bold text-warning" v-if="active_employee.work_status===2">休憩中</h4>
+                            <h4 class="fw-bold">@{{active_employee.name}}</h4>
                         </div>
 
                         <!-- button -->
                         <div class="d-grid gap-2 mt-3">
-                            <button class="btn btn-outline-success btn-lg" type="button" v-if="active_employee.work_status===0">勤務開始</button>
-                            <button class="btn btn-outline-warning btn-lg" type="button" v-if="active_employee.work_status===1">休憩開始開始</button>
-                            <button class="btn btn-outline-warning btn-lg" type="button"  v-if="active_employee.work_status===2">休憩終了</button>
-                            <button class="btn btn-outline-danger btn-lg" type="button" v-if="active_employee.work_status===1">勤務終了</button>
+                            <button class="btn btn-success btn-lg" type="button"
+                             v-if="active_employee.work_status===0"
+                             @click="workIn()"
+                            >勤務開始</button>
+                            <button class="btn btn-warning btn-lg" type="button"
+                             v-if="active_employee.work_status===1"
+                             @click="breakIn()"
+                            >休憩開始開始</button>
+                            <button class="btn btn-warning btn-lg" type="button"
+                             v-if="active_employee.work_status===2"
+                             @click="breakOut()"
+                            >休憩終了</button>
+                            <button class="btn btn-danger btn-lg" type="button"
+                             v-if="active_employee.work_status===1"
+                             @click="workOut()"
+                            >勤務終了</button>
                         </div>
 
                     </div>
@@ -203,34 +229,6 @@
 
                 </div>
 
-                {{-- <div class="card" style="min-height:23rem;">
-
-                    <div class="border-bottom" style="height:3rem; line-height:3rem;">
-                        <h4 class="fw-bold text-secondary">従業員を選択してください</h4>
-                    </div>
-
-                    <div class="card-body">
-                        <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
-                        style="background-color:pink; border:16px solid pink;" width="100" height="100"
-                        >
-
-                        <div>
-                            <h4 class="fw-bold text-success">出勤中</h4>
-                            <h4 class="fw-bold text-warning">休憩中</h4>
-                            <h4 class="fw-bold text-secondary">退勤中</h4>
-                        </div>
-
-                        <!-- button -->
-                        <div class="d-grid gap-2 mt-3">
-                            <button class="btn btn-outline-success btn-lg" type="button">勤務開始</button>
-                            <button class="btn btn-outline-warning btn-lg" type="button">休憩開始開始</button>
-                            <button class="btn btn-outline-warning btn-lg" type="button">休憩終了</button>
-                            <button class="btn btn-outline-danger btn-lg" type="button">勤務終了</button>
-                        </div>
-
-                    </div>
-                </div> --}}
-
             </div>
         </section>
 
@@ -239,21 +237,25 @@
         <section class="mb-5">
             <ul class="list-group mb-5 w-md-100">
 
-                <li class="list-group-item list-group-item-action"
+                <li class="list-group-item list-group-item-action d-flex justify-content-between  align-items-center"
                  v-for="(employee, e_index) in employees"
+                 :class="{'list-group-item-primary':active_index===e_index}"
                  @click="selectEmployee(e_index)"
                 >
-                    <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
-                     :style=" 'background-color:'+employee.color+'; border:5px solid '+employee.color+';' "
-                     width="30" height="30"
-                    >
+                    <div class="ms-2 me-auto">
+                        <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
+                        :style=" 'background-color:'+employee.color+'; border:5px solid '+employee.color+';' "
+                        width="30" height="30"
+                        >
+                        <p class="d-inline ms-2">@{{employee.name}}</p>
+                    </div>
 
-                    <p class="d-inline ms-2">@{{employee.name}}</p>
-                    <p class="d-inline ms-2">@{{employee.color}}</p>
+                    {{-- <div class="ms-2 me-auto"> --}}
+                        <div v-if="employee.work_status === 0" class="ms-5 me-5 fw-bold text-secondary">退勤中</div>
+                        <div v-if="employee.work_status === 1" class="ms-5 me-5 fw-bold text-success">出勤中</div>
+                        <div v-if="employee.work_status === 2" class="ms-5 me-5 fw-bold text-warning">休憩中</div>
+                    {{-- </div> --}}
 
-                    <p v-if="employee.work_status === 0" class="d-inline ms-5 me-5 fw-bold text-secondary">退勤中</p>
-                    <p v-if="employee.work_status === 1" class="d-inline ms-5 me-5 fw-bold text-success">出勤中</p>
-                    <p v-if="employee.work_status === 2" class="d-inline ms-5 me-5 fw-bold text-warning">休憩中</p>
                 </li>
 
             </ul>

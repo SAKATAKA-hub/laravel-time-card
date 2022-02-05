@@ -63,6 +63,7 @@ class InputWorkRecordController extends Controller
     {
         return response()->json([
             'comment' => 'work_in OK!',
+            'request' => $request->all(),
         ]);
     }
 
@@ -81,6 +82,7 @@ class InputWorkRecordController extends Controller
     {
         return response()->json([
             'comment' => 'break_in OK!',
+            'request' => $request->all(),
         ]);
     }
 
@@ -99,6 +101,7 @@ class InputWorkRecordController extends Controller
     {
         return response()->json([
             'comment' => 'break_out OK!',
+            'request' => $request->all(),
         ]);
     }
 
@@ -115,6 +118,7 @@ class InputWorkRecordController extends Controller
     {
         return response()->json([
             'comment' => 'work_out OK!',
+            'request' => $request->all(),
         ]);
     }
 

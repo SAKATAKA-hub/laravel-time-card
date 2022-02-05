@@ -43,9 +43,10 @@
         // route
         const route = {
             employeees_json : document.querySelector('meta[name="route_employeees_json"]').content,
-            // validate_input_time : document.querySelector('meta[name="route_validate_input_time"]').content,
-            // update : document.querySelector('meta[name="route_update"]').content,
-            // destroy : document.querySelector('meta[name="route_destroy"]').content,
+            work_in : document.querySelector('meta[name="route_work_in"]').content,
+            break_in : document.querySelector('meta[name="route_break_in"]').content,
+            break_out : document.querySelector('meta[name="route_break_out"]').content,
+            work_out : document.querySelector('meta[name="route_work_out"]').content,
         };
 
         //param
@@ -68,9 +69,9 @@
 
                 workStatusText : ['退勤中','出勤中','休憩中'],
 
-                message : null;
+                message : null,
                 messages : [
-                    {'color'=>'','message'=>''}
+                    {'color': '','message': ''},
                 ],
 
 
@@ -88,7 +89,6 @@
                     body : new URLSearchParams({
                         _token : token,
                         user_id :  param.user_id,
-                        // date :  param.date,
                     }),
                 })
                 .then(response => {
@@ -100,8 +100,15 @@
                     console.log(json);
                     this.employees = json.employees;
 
+
+
                     //'active_employee'に選択中従業員のデータをコピーする
-                    this.active_employee = Object.assign({},this.employees[0]);;
+                    let e_index = 0;
+                    this.active_employee = Object.assign({},this.employees[e_index]);
+                    this.active_index = e_index;
+
+
+
                 })
                 .catch(error => {
                     alert('データの読み込みに失敗しました。');
@@ -126,22 +133,134 @@
                     this.employees[e_index].active = true;
 
                     //'active_employee'に選択中従業員のデータをコピーする
-                    this.active_employee = Object.assign({},this.employees[e_index]);;
+                    this.active_employee = Object.assign({},this.employees[e_index]);
+                    this.active_index = e_index;
                     console.log(this.active_employee);
 
                 },
 
 
-                // /*
-                // | 2. 勤務記録の修正中断(editCancel)
-                // */
-                // editCancel : function(){
-                //     this.editing_index = null;
-                //     this.editing_work_time = [];
-                //     this.remember_work_time = [];
-                //     this.delete_break_times = [];
-                //     this.errors = [];
-                // },
+                /*
+                | 2. 勤務開始(workIn)
+                */
+                workIn : function(){
+
+                    fetch( route.work_in, {
+                        method : 'POST',
+                        body : new URLSearchParams({
+                            _token : token,
+                            employee_id :  this.active_employee.id,
+                            work_status :  this.active_employee.work_status,
+                        }),
+                    })
+                    .then(response => {
+                        if(!response.ok){ throw new Error(); }
+                        return response.json();
+                    })
+                    .then(json => {
+
+                        console.log(json);
+                        this.active_employee.work_status = 1 ;
+
+                    })
+                    .catch(error => {
+                        alert('データの読み込みに失敗しました。');
+                    });
+
+                },
+
+
+                /*
+                | 3. 勤務開始(breakIn)
+                */
+                breakIn : function(){
+
+
+                    fetch( route.break_in, {
+                        method : 'POST',
+                        body : new URLSearchParams({
+                            _token : token,
+                            employee_id :  this.active_employee.id,
+                            work_status :  this.active_employee.work_status,
+                        }),
+                    })
+                    .then(response => {
+                        if(!response.ok){ throw new Error(); }
+                        return response.json();
+                    })
+                    .then(json => {
+
+                        console.log(json);
+                        this.active_employee.work_status = 2 ;
+
+                    })
+                    .catch(error => {
+                        alert('データの読み込みに失敗しました。');
+                    });
+
+                },
+
+
+                /*
+                | 4. 勤務開始(breakOut)
+                */
+                breakOut : function(){
+
+                    fetch( route.break_out, {
+                        method : 'POST',
+                        body : new URLSearchParams({
+                            _token : token,
+                            _method : 'PATCH',
+                            employee_id :  this.active_employee.id,
+                            work_status :  this.active_employee.work_status,
+                        }),
+                    })
+                    .then(response => {
+                        if(!response.ok){ throw new Error(); }
+                        return response.json();
+                    })
+                    .then(json => {
+
+                        console.log(json);
+                        this.active_employee.work_status = 1 ;
+
+                    })
+                    .catch(error => {
+                        alert('データの読み込みに失敗しました。');
+                    });
+
+                },
+
+
+                /*
+                | 5. 勤務開始(workOut)
+                */
+                workOut : function(){
+
+                    fetch( route.work_out, {
+                        method : 'POST',
+                        body : new URLSearchParams({
+                            _token : token,
+                            _method : 'PATCH',
+                            employee_id :  this.active_employee.id,
+                            work_status :  this.active_employee.work_status,
+                        }),
+                    })
+                    .then(response => {
+                        if(!response.ok){ throw new Error(); }
+                        return response.json();
+                    })
+                    .then(json => {
+
+                        console.log(json);
+                        this.active_employee.work_status = 0 ;
+
+                    })
+                    .catch(error => {
+                        alert('データの読み込みに失敗しました。');
+                    });
+
+                },
 
 
                 // /*
