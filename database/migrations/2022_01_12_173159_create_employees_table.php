@@ -18,7 +18,7 @@ class CreateEmployeesTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('name',100);
             $table->string('color',100);
-            $table->string('work_status')->default('out');
+            // $table->string('work_status')->default('out');
 
             $table->timestamps();
 

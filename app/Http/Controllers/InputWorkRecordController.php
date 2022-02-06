@@ -37,11 +37,8 @@ class InputWorkRecordController extends Controller
         $employees = Employee::where('user_id',$request->user_id)->get();
         foreach ($employees as $employee)
         {
-            $employee->work_status = 0; //出勤状況
-            $employee->active = false; //タイムカード表示時中か否か
+            $employee['work_status'] = $employee->work_status; //従業員の出勤状況
         }
-
-        // dd($employees);
 
 
         return response()->json([

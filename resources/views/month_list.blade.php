@@ -96,7 +96,12 @@
 
                 @forelse ($employees as $employee)
                 <tr>
-                    <th scope="row">{{$employee->name}}</th>
+                    <th scope="row" class="text-start">
+                        <img src="{{asset('svg/employee.svg')}}" class="rounded-circle ms-3 mb-1" width="20" height="20"
+                            style="background-color:{{$employee->color}}; border:5px solid {{$employee->color}};' "
+                        >
+                        {{$employee->name}}
+                    </th>
                     <td></td>
 
                     <td scope="col">{{$employee->total_times['restrain_hour']}}</td> <!-- 総勤務時間(h) -->

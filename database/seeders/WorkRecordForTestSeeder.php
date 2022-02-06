@@ -50,7 +50,8 @@ class WorkRecordForTestSeeder extends Seeder
         */
 
         $faker = Factory::create('ja_JP');
-        $color = ['red','blue','green'];
+        $color = ['#0d6efd','#6610f2','#6f42c1','#d63384','#dc3545','#fd7e14','#ffc107','#198754','#20c997','#0dcaf0',];
+        // ['blue','indigo','purple','pink','red','orange','yellow','green','teal','cyan']
 
 
         $count = 7; //従業員数

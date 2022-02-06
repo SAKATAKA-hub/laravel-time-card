@@ -173,19 +173,21 @@
                     <div class="card-body">
 
                         <div>
-                            {{-- <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
+                            <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
                              v-if="active_employee.work_status===0"
                              style="background-color:#6c757d; border:16px solid #6c757d;" width="100" height="100"
-                            > --}}
+                            >
                             <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
-                             {{-- v-else --}}
+                             v-else
                              :style=" 'background-color:'+active_employee.color+'; border:16px solid '+active_employee.color+';' "
                              width="100" height="100"
                             >
                         </div>
 
                         <div>
-                            <h4 class="fw-bold">@{{active_employee.name}}</h4>
+                            <h4 class="fw-bold"
+                             :class="{'text-secondary':active_employee.work_status===0}"
+                            >@{{active_employee.name}}</h4>
                         </div>
 
                         <!-- button -->
@@ -222,6 +224,7 @@
                         <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
                          style="background-color:#6c757d; border:16px solid #6c757d;" width="100" height="100"
                         >
+
                         <div>
                             <h4 class="fw-bold text-secondary">従業員を選択してください</h4>
                         </div>
@@ -243,18 +246,22 @@
                  @click="selectEmployee(e_index)"
                 >
                     <div class="ms-2 me-auto">
+
                         <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
-                        :style=" 'background-color:'+employee.color+'; border:5px solid '+employee.color+';' "
-                        width="30" height="30"
-                        >
-                        <p class="d-inline ms-2">@{{employee.name}}</p>
+                            v-if="employee.work_status===0"
+                            style="background-color:#6c757d; border:5px solid #6c757d;" width="30" height="30"
+                        ><!-- 退勤中 背景色:secondary -->
+                        <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3" width="30" height="30"
+                            v-else
+                            :style=" 'background-color:'+employee.color+'; border:5px solid '+employee.color+';' "
+                        ><!-- 出勤中 背景色:employee_color -->
+
+                        <p class="d-inline ms-2" :class="{'text-secondary':employee.work_status===0}">@{{employee.name}}</p>
                     </div>
 
-                    {{-- <div class="ms-2 me-auto"> --}}
-                        <div v-if="employee.work_status === 0" class="ms-5 me-5 fw-bold text-secondary">退勤中</div>
-                        <div v-if="employee.work_status === 1" class="ms-5 me-5 fw-bold text-success">出勤中</div>
-                        <div v-if="employee.work_status === 2" class="ms-5 me-5 fw-bold text-warning">休憩中</div>
-                    {{-- </div> --}}
+                    <div v-if="employee.work_status === 0" class="ms-5 me-5 fw-bold text-secondary">退勤中</div>
+                    <div v-if="employee.work_status === 1" class="ms-5 me-5 fw-bold text-success">出勤中</div>
+                    <div v-if="employee.work_status === 2" class="ms-5 me-5 fw-bold text-warning">休憩中</div>
 
                 </li>
 

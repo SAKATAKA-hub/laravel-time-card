@@ -51,8 +51,8 @@ class WorkRecordStatusSeeder extends Seeder
         */
 
         $faker = Factory::create('ja_JP');
-        $color = ['red','blue','green'];
-
+        $color = ['#0d6efd','#6610f2','#6f42c1','#d63384','#dc3545','#fd7e14','#ffc107','#198754','#20c997','#0dcaf0',];
+        // ['blue','indigo','purple','pink','red','orange','yellow','green','teal','cyan']
 
         $count = 7; //従業員数
         for ($i=0; $i < $count; $i++)
@@ -180,14 +180,17 @@ class WorkRecordStatusSeeder extends Seeder
      */
     public static function createWorkRecord($date,$wi,$user)
     {
-        #0. 変数の準備
+        #0 明日の出勤データはスキップ
+        if( $date->isToday() && $wi>10 ){ return; }
+
+        #1. 変数の準備
         // 各従業員の勤務スケジュール
         $schedules = self::getSchedules();
         $work_schedule = $schedules['work_schedules'][$wi];
         $break_schedules = $schedules['break_schedules'][$wi];
 
 
-        #1. 出退勤記録の作成
+        #2. 出退勤記録の作成
         // 出勤時間
         $in = $work_schedule[0] === '00:00:00' ? '00:00:00':
             Carbon::parse( $date->format('Y-m-d').' '.$work_schedule[0] )
@@ -224,7 +227,7 @@ class WorkRecordStatusSeeder extends Seeder
         }
 
 
-        #2. 休憩記録の作成
+        #3. 休憩記録の作成
         foreach ($break_schedules as $break_schedule)
         {
             // 休憩開始時間

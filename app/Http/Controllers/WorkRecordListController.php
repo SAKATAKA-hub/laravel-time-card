@@ -160,7 +160,7 @@ class WorkRecordListController extends Controller
         # 表示中従業員
         // 従業員のリクエストが無ければ、先頭の従業員
         $employee_id = empty( $request->employee_id ) ? $employees[0]->id : (int)$request->employee_id ;
-        $employee_name = Employee::find($employee_id)->name;
+        $employee = Employee::find($employee_id);
 
 
         # (ユーザーに紐づく)従業員と日付を指定した、勤務データの取得
@@ -182,7 +182,7 @@ class WorkRecordListController extends Controller
 
 
         return view('parsonal_list',
-            compact('date_ob','weeks','employees','employee_id','employee_name','work_times','total_times')
+            compact('date_ob','weeks','employees','employee_id','employee','work_times','total_times')
         );
     }
 

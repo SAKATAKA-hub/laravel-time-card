@@ -59,7 +59,15 @@
         <a href="{{route($rote_name,['month'=>$befor_date_ob->format('Y-m')])}}" class="me-3">前月</a>
 
         <!--表示中の年月 従業員名-->
-        <div class="fs-3">{{$date_ob->format('Y年m月')}} {{$employee_name}}</div>
+        <div class="fs-3">
+            {{$date_ob->format('Y年m月')}}
+
+            <img src="{{asset('svg/employee.svg')}}" class="rounded-circle ms-3 mb-1" width="26" height="26"
+                style="background-color:{{$employee->color}}; border:5px solid {{$employee->color}};' "
+            >
+
+            {{$employee->name}}
+        </div>
 
         <!--翌月-->
         @php $next_date_ob = $date_ob->copy()->addMonth(); @endphp
@@ -85,7 +93,6 @@
         <table class="table bg-white text-center" style="width: 900px;">
             <thead class="border-secondary">
                 <tr>
-                    <th scope="col">氏 名</th>
                     <th scope="col">日 付</th>
                     <th scope="col">就 業</th>
                     <th scope="col">休 憩</th>
@@ -99,7 +106,6 @@
 
                 @forelse ($work_times as $work_time)
                 <tr>
-                    <th scope="row">{{$work_time->employee->name}}</th>
                     <td>{{$work_time->date_text}}</td>
                     <td>{{$work_time->text}}</td>
                     <td></td>
@@ -114,7 +120,6 @@
                     <tr>
                         <td></td>
                         <td></td>
-                        <td></td>
                         <td>{{$break_time->text}}</td>
                         <td></td>
                         <td></td>
@@ -126,7 +131,7 @@
                 <!-- 勤務記録が存在しないとき -->
                 @empty
                     <tr>
-                        <th colspan="8" class="text-secondary">
+                        <th colspan="7" class="text-secondary">
                             勤務記録がありません
                         </th>
                     </tr>
@@ -135,7 +140,6 @@
             </tbody>
             <tfoot class="border-secondary">
                 <tr>
-                    <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col"></th>

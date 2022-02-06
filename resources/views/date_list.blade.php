@@ -95,7 +95,12 @@
 
                 @forelse ($work_times as $work_time)
                 <tr>
-                    <th scope="row">{{$work_time->employee->name}}</th>
+                    <th scope="row" class="text-start">
+                        <img src="{{asset('svg/employee.svg')}}" class="rounded-circle ms-3 mb-1" width="20" height="20"
+                            style="background-color:{{$work_time->employee->color}}; border:5px solid {{$work_time->employee->color}};' "
+                        >
+                        {{$work_time->employee->name}}
+                    </th>
                     <td>{{$work_time->text}}</td>
                     <td></td>
 

@@ -101,12 +101,12 @@
                     this.employees = json.employees;
 
 
-
-                    //'active_employee'に選択中従業員のデータをコピーする
-                    let e_index = 0;
-                    this.active_employee = Object.assign({},this.employees[e_index]);
-                    this.active_index = e_index;
-
+                    if(this.form_test){
+                        //'active_employee'に選択中従業員のデータをコピーする
+                        let e_index = 0;
+                        this.active_employee = Object.assign({},this.employees[e_index]);
+                        this.active_index = e_index;
+                    }
 
 
                 })
@@ -161,6 +161,7 @@
 
                         console.log(json);
                         this.active_employee.work_status = 1 ;
+                        this.employees[this.active_index].work_status = 1 ;
 
                     })
                     .catch(error => {
@@ -192,6 +193,7 @@
 
                         console.log(json);
                         this.active_employee.work_status = 2 ;
+                        this.employees[this.active_index].work_status = 2 ;
 
                     })
                     .catch(error => {
@@ -223,6 +225,7 @@
 
                         console.log(json);
                         this.active_employee.work_status = 1 ;
+                        this.employees[this.active_index].work_status = 1 ;
 
                     })
                     .catch(error => {
@@ -254,6 +257,7 @@
 
                         console.log(json);
                         this.active_employee.work_status = 0 ;
+                        this.employees[this.active_index].work_status = 0 ;
 
                     })
                     .catch(error => {
