@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\WorkTime;
+use App\Models\BreakTime;
 use App\Models\Employee;
+
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -58,6 +62,24 @@ class InputWorkRecordController extends Controller
     */
     public function work_in(Request $request)
     {
+        # 従業員の現在の出勤状況が処理に対して正しいかチェック($request->work_status: 0 退勤中)
+        $work_status = Employee::find($request->employee_id)->work_status;
+        if( $work_status !== (int) $request->work_status )
+        {
+            return response()->json([],422); //正しくなければ、エラーを返す
+        }
+
+
+        # 勤務データの作成
+        $work_time = new WorkTime([
+            'employee_id' => $request->employee_id,
+            'date' =>  Carbon::parse('today')->format('Y-m-d'),
+            'in' => Carbon::parse('now')->format('H:i:s'),
+            'out' => null,
+        ]);
+        $work_time->save();
+
+
         return response()->json([
             'comment' => 'work_in OK!',
             'request' => $request->all(),
@@ -75,8 +97,29 @@ class InputWorkRecordController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return Json
     */
-        public function break_in(Request $request)
+    public function break_in(Request $request)
     {
+        # 従業員の現在の出勤状況が処理に対して正しいかチェック($request->work_status: 1 出勤中)
+        $work_status = Employee::find($request->employee_id)->work_status;
+        if( $work_status !== (int) $request->work_status )
+        {
+            return response()->json([],422); //正しくなければ、エラーを返す
+        }
+
+
+        # 休憩データの作成
+        $work_time = WorkTime::where('employee_id',$request->employee_id)
+        ->orderBy('date','desc')->orderBy('in','desc')->first();
+
+        $break_time = new BreakTime([
+            'work_time_id' => $work_time->id,
+            'in' => Carbon::parse('now')->format('H:i:s'),
+            'out' => null,
+        ]);
+        $break_time->save();
+
+
+
         return response()->json([
             'comment' => 'break_in OK!',
             'request' => $request->all(),
@@ -96,6 +139,26 @@ class InputWorkRecordController extends Controller
     */
     public function break_out(Request $request)
     {
+        # 従業員の現在の出勤状況が処理に対して正しいかチェック($request->work_status: 2 休憩中)
+        $work_status = Employee::find($request->employee_id)->work_status;
+        if( $work_status !== (int) $request->work_status )
+        {
+            return response()->json([],422); //正しくなければ、エラーを返す
+        }
+
+
+        # 休憩データの更新
+        $work_time = WorkTime::where('employee_id',$request->employee_id)
+        ->orderBy('date','desc')->orderBy('in','desc')->first();
+
+        $break_time = BreakTime::where('work_time_id',$work_time->id)
+        ->orderBy('in','desc')->first();
+
+        $break_time->update([
+            'out' => Carbon::parse('now')->format('H:i:s'),
+        ]);
+
+
         return response()->json([
             'comment' => 'break_out OK!',
             'request' => $request->all(),
@@ -113,6 +176,24 @@ class InputWorkRecordController extends Controller
     */
         public function work_out(Request $request)
     {
+        # 従業員の現在の出勤状況が処理に対して正しいかチェック($request->work_status: 2 休憩中)
+        $work_status = Employee::find($request->employee_id)->work_status;
+        if( $work_status !== (int) $request->work_status )
+        {
+            return response()->json([],422); //正しくなければ、エラーを返す
+        }
+
+
+        # 勤務データの更新
+        $work_time = WorkTime::where('employee_id',$request->employee_id)
+        ->orderBy('date','desc')->orderBy('in','desc')->first();
+
+
+        $work_time->update([
+            'out' => Carbon::parse('now')->format('H:i:s'),
+        ]);
+
+
         return response()->json([
             'comment' => 'work_out OK!',
             'request' => $request->all(),

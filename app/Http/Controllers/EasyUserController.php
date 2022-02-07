@@ -32,7 +32,7 @@ class EasyUserController extends Controller
         # 作成データの加工
         $user = User::orderBy('id','desc')->first();
         $now = Carbon::parse('now');
-        $email = $now->format('Y/m/d/H:i:s').'@mail.co.jp';
+        $email = $now->format('YmdHis').'@mail.co.jp';
 
         $user->update([
             'name' => 'ワンタイムユーザー',

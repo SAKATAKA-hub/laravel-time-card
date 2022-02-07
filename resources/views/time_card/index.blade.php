@@ -117,6 +117,16 @@
                     </form>
                 </li>
 
+                <li>
+                    <h5 class="d-inline">勤務開始処理(work_in)</h5>
+                    <form action="{{route('time_card.work_in')}}" method="POST" class="d-inline">
+                        @csrf
+                        <input type="hidden" name="employee_id" :value="active_employee.id">
+                        <button>実行</button>
+                    </form>
+                </li>
+
+
             </ul>
 
 
@@ -190,6 +200,31 @@
                             >@{{active_employee.name}}</h4>
                         </div>
 
+                        <!-- alert -->
+                        <div class="ms-3 me-3">
+                            <div class="alert alert-info alert-dismissible fade show" role="alert"
+                             v-if="alert_index === 0"
+                            >
+                                今日も一日<br>おつかれさまでした！
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+
+                            <div class="alert alert-success alert-dismissible fade show" role="alert"
+                             v-if="alert_index === 1"
+                            >
+                                おはようございます。<br>今日も一日がんばりましょう！
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+
+                            <div class="alert alert-success alert-dismissible fade show" role="alert"
+                             v-if="alert_index === 2"
+                            >
+                                おかえりなさい。<br>引き続きがんばりましょう！
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        </div>
+
+
                         <!-- button -->
                         <div class="d-grid gap-2 mt-3">
                             <button class="btn btn-success btn-lg" type="button"
@@ -199,7 +234,7 @@
                             <button class="btn btn-warning btn-lg" type="button"
                              v-if="active_employee.work_status===1"
                              @click="breakIn()"
-                            >休憩開始開始</button>
+                            >休憩開始</button>
                             <button class="btn btn-warning btn-lg" type="button"
                              v-if="active_employee.work_status===2"
                              @click="breakOut()"

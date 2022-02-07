@@ -60,7 +60,7 @@
 
 
             data : {
-                form_test : true,
+                form_test : false,
 
 
                 employees : [],
@@ -69,10 +69,7 @@
 
                 workStatusText : ['退勤中','出勤中','休憩中'],
 
-                message : null,
-                messages : [
-                    {'color': '','message': ''},
-                ],
+                alert_index : null,
 
 
             }, //end data
@@ -135,6 +132,7 @@
                     //'active_employee'に選択中従業員のデータをコピーする
                     this.active_employee = Object.assign({},this.employees[e_index]);
                     this.active_index = e_index;
+                    this.alert_index = null;
                     console.log(this.active_employee);
 
                 },
@@ -158,21 +156,21 @@
                         return response.json();
                     })
                     .then(json => {
-
                         console.log(json);
                         this.active_employee.work_status = 1 ;
                         this.employees[this.active_index].work_status = 1 ;
-
+                        this.alert_index = 1;
                     })
                     .catch(error => {
-                        alert('データの読み込みに失敗しました。');
+                        alert('通信エラーが発生しました。ページを再読み込みします。');
+                        location.reload();
                     });
 
                 },
 
 
                 /*
-                | 3. 勤務開始(breakIn)
+                | 3. 休憩開始(breakIn)
                 */
                 breakIn : function(){
 
@@ -190,21 +188,21 @@
                         return response.json();
                     })
                     .then(json => {
-
                         console.log(json);
                         this.active_employee.work_status = 2 ;
                         this.employees[this.active_index].work_status = 2 ;
-
+                        this.alert_index = null;
                     })
                     .catch(error => {
-                        alert('データの読み込みに失敗しました。');
+                        alert('通信エラーが発生しました。ページを再読み込みします。');
+                        location.reload();
                     });
 
                 },
 
 
                 /*
-                | 4. 勤務開始(breakOut)
+                | 4. 休憩終了(breakOut)
                 */
                 breakOut : function(){
 
@@ -222,21 +220,21 @@
                         return response.json();
                     })
                     .then(json => {
-
                         console.log(json);
                         this.active_employee.work_status = 1 ;
                         this.employees[this.active_index].work_status = 1 ;
-
+                        this.alert_index = 2;
                     })
                     .catch(error => {
-                        alert('データの読み込みに失敗しました。');
+                        alert('通信エラーが発生しました。ページを再読み込みします。');
+                        // location.reload();
                     });
 
                 },
 
 
                 /*
-                | 5. 勤務開始(workOut)
+                | 5. 勤務終了(workOut)
                 */
                 workOut : function(){
 
@@ -254,14 +252,14 @@
                         return response.json();
                     })
                     .then(json => {
-
                         console.log(json);
                         this.active_employee.work_status = 0 ;
                         this.employees[this.active_index].work_status = 0 ;
-
+                        this.alert_index = 0;
                     })
                     .catch(error => {
-                        alert('データの読み込みに失敗しました。');
+                        alert('通信エラーが発生しました。ページを再読み込みします。');
+                        // location.reload();
                     });
 
                 },
