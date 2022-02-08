@@ -14,17 +14,19 @@
 
     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 
+        @if (Auth::user()->app_dministrator)
+        <li>
+            <a class="dropdown-item" href="">管理者ページ</a>
+        </li>
+        @endif
+
+        <li><hr class="dropdown-divider"></li>
+
         <li>
             <a class="dropdown-item" href="">
                 <i class="bi bi-person"></i> マイページ
             </a>
         </li>
-
-        @if (Auth::user()->app_dministrator)
-        <li>
-            <a class="dropdown-item" href="{{route('app_admin.top')}}">管理者ページ</a>
-        </li>
-        @endif
 
         <li>
             <a class="dropdown-item" href="{{route('edit_register')}}">ユーザー情報の変更</a>

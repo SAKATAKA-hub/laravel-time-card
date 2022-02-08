@@ -137,26 +137,8 @@
     <div class="d-md-flex">
         <section class="mb-5" style="flex:1;">
 
-            <!-- alert -->
-            <div class="ms-3 me-3">
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    おはようございます。<br>今日も一日がんばりましょう！
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-
-                {{-- <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    おはようございます。<br>今日も一日がんばりましょう！
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div> --}}
-
-                {{-- <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    今日も一日おつかれさまでした！
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div> --}}
-            </div>
-
             <!--現在時刻の表示領域-->
-            <div id="showTime" class="mb-3">
+            <div id="showTime" class="mt-3">
                 <div id="nowDay"></div>
                 <div id="nowAmPm"></div>
                 <div id="nowTime"></div>

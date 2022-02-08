@@ -1,9 +1,8 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Common;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Employee;
 use App\Models\WorkTime;
@@ -13,119 +12,29 @@ use Faker\Factory;
 
 
 
-
-class WorkRecordStatusSeeder extends Seeder
+/*
+====================================================
+ クラス内で利用するメソッド
+====================================================
+*/
+class Method
 {
     /**
-     * Run the database seeds.
+     * 各従業員の勤務スケジュールを呼び出すメソッド
      *
-     * @return void
+     * @return Array
      */
-    public function run()
+    public static function EmployeeCount()
     {
-        /**
-         * =================================================
-         * 1.ユーザの新規作成
-         * =================================================
-        */
-
-        $now = Carbon::parse('now');
-
-        $email = $now->format('YmdHis').'@mail.co.jp';
-        $user = new User([
-            'name' => 'シーダー登録ユーザー',
-            'email' => $email,
-            'password'  =>  Hash::make('password'),
-            'easy_user' => 0,
-        ]);
-        $user->save();
-
-
-
-
-        /**
-         * =================================================
-         * 2.フェイク従業員データの作成
-         * =================================================
-        */
-
-        $faker = Factory::create('ja_JP');
-        $color = ['#0d6efd','#6610f2','#6f42c1','#d63384','#dc3545','#fd7e14','#ffc107','#198754','#20c997','#0dcaf0',];
-        // ['blue','indigo','purple','pink','red','orange','yellow','green','teal','cyan']
-
-        $count = 7; //従業員数
-        for ($i=0; $i < $count; $i++)
-        {
-            $employee = new Employee([
-                'user_id' => $user->id,
-                'name' => $faker->name(),
-                'color' => $faker->randomElement($color),
-            ]);
-            $employee->save();
-        }
-
-
-
-
-        /**
-         * =================================================
-         * 3.フェイク勤務記録の作成
-         * =================================================
-        */
-        $user = User::orderBy('id','desc')->first();
-
-        // 勤務スケジュールの取得
-        $schedules = self::getSchedules();
-        $work_schedules = $schedules['work_schedules'];
-
-        $now = Carbon::parse('now'); //現在の日時
-        $m = 3; //$mヶ月前からデータを作成
-        $d = 3; //1ヶ月に$d日分のデータを作成
-        $thisMonth = Carbon::parse($now->format('Y-m-'.$d)); //今月
-
-
-        for ($mi=0; $mi < $m; $mi++) { //$mヶ月の繰り返し
-            $month = $thisMonth->copy()->subMonth( $m - ($mi+1) );
-
-
-            for ($di=0; $di < $d; $di++) { //$d日の繰り返し
-                $date = $month->format('Ym') !== $now->format('Ym') ?
-                    $month->copy()->subDay( $d - ($di+1) ) :
-                    $now->copy()->subDay( $d - ($di+1) )
-                ;
-
-                // 勤務データの作成
-                foreach ($work_schedules as $wi => $work_schedule)
-                {
-                    self::createWorkRecord($date,$wi,$user);
-                }
-
-
-            } //end for $di
-
-
-        } //end for $mi
-
-
-
-        return;
+        return 7;
     }
-
-
-
-
-    /**
-     * ====================================================
-     *  クラス内で利用するメソッド
-     * ====================================================
-     */
 
     /**
      * 各従業員の勤務スケジュールを呼び出すメソッド
      *
      * @return Array
      */
-    public static function getSchedules()
+    public static function GetSchedules()
     {
         // 出退勤時間
         $work_schedules = [
@@ -177,7 +86,7 @@ class WorkRecordStatusSeeder extends Seeder
      * @param App\Models\User $user
      * @return void
      */
-    public static function createWorkRecord($date,$wi,$user)
+    public static function CreateWorkRecord($date,$wi,$user)
     {
         #0 明日の出勤データはスキップ
         if( $date->isToday() && $wi>10 ){ return; }

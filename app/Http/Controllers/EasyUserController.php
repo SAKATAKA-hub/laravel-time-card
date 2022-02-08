@@ -17,29 +17,29 @@ use Faker\Factory;
 use Database\Seeders\WorkRecordStatusSeeder;
 
 
-
 class EasyUserController extends Controller
 {
+
+
     public function create_easy_user(Request $request)
     {
-        \Database\Seeders\WorkRecordForTestSeeder::run();
+        // dd(\Database\Seeders\Common\Method::getSchedules());
 
 
 
-        # フェイクデータの作成
-        // WorkRecordStatusSeeder::run();
 
-        # 作成データの加工
-        $user = User::orderBy('id','desc')->first();
-        $now = Carbon::parse('now');
-        $email = $now->format('YmdHis').'@mail.co.jp';
+        # DBデータの作成
+        //1.ユーザの新規作成
+        \Database\Seeders\User\EasySeeder::run();
+        // \Database\Seeders\User\TestSeeder::run();
+        // \Database\Seeders\User\DefaultSeeder::run();
 
-        $user->update([
-            'name' => 'ワンタイムユーザー',
-            'email' => $email,
-            'easy_user' => 1,
-        ]);
+        //2.フェイク従業員データの作成
+        \Database\Seeders\EmployeesSeeder::run();
 
+        //3.フェイク勤務記録の作成
+        \Database\Seeders\WorkRecord\ThreeMonthsSeeder::run(); //(3ヶ月分)
+        // \Database\Seeders\WorkRecord\ThreeDaysSeeder::run(); //(3日分)
 
 
         # セッションの削除
@@ -48,9 +48,11 @@ class EasyUserController extends Controller
         $request->session()->regenerateToken(); //セッションの再作成(二重送信の防止)
 
 
+
         # ログイン処理
+        $user = User::orderBy('id','desc')->first();
         $credentials = [
-            'email' => $email,
+            'email' => $user->email,
             'password' => 'password',
         ];
         if (Auth::attempt($credentials))

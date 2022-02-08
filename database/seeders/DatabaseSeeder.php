@@ -14,7 +14,11 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // \App\Models\User::factory(10)->create();
+        $this->call([
+            User\DefaultSeeder::class, //1.ユーザの新規作成
+            EmployeesSeeder::class, //2.フェイク従業員データの作成
+            WorkRecord\ThreeMonthsSeeder::class, //3.フェイク勤務記録の作成(3ヶ月分)
+        ]);
 
-        $this->call(WorkRecordStatusSeeder::class);
     }
 }
