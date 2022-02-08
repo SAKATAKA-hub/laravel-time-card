@@ -20,7 +20,6 @@ class AuthController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return redirect
     */
-
     public function login(Request $request)
     {
         // ログイン成功の処理
@@ -57,7 +56,7 @@ class AuthController extends Controller
         $request->session()->regenerateToken(); //セッションの再作成(二重送信の防止)
 
 
-        return redirect()->route('top',);
+        return redirect()->route('login_form');
     }
 
 
