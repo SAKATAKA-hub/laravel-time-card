@@ -17,30 +17,32 @@ class WorkRecordTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * A basic Unit test example.
-     *
+     * テストデータの挿入テスト.
      * @return void
      */
-    public function test_example()
+    public function test_create_test_data()
     {
 
         # データの挿入
-        $this->seed();
-        // $this->seed([
-        //     WorkRecordStatusSeeder::class,
-        // ]);
+        $this->seed([
+            \Database\Seeders\User\TestSeeder::class, //1.ユーザの新規作成
+            \Database\Seeders\EmployeesSeeder::class, //2.フェイク従業員データの作成
+            //3.フェイク勤務記録の作成
+        ]);
 
         # テーブルのデータ数チェック
         // $this->assertDatabaseCount('users', 1);
 
-        # 指定カラムに指定の値が存在するかチェック
+        # usersテーブルにテストユーザーデータが登録されたかチェック
         $this->assertDatabaseHas('users', [
-            'name' => 'シーダー登録ユーザー',
+            'name' => 'テストユーザー',
+            'email' => 'test@mail.co.jp',
         ]);
 
-        # 値が等しいかのチェック
-        $user = User::orderBy('id','desc')->first();
-        $this->assertEquals($user->name, 'シーダー登録ユーザー');
+        # employeesテーブルに登録した従業員データ数が正しいかチェック
+        $user = User::where('name','テストユーザー')->first();
+        $employees = $user->employees;
+        $this->assertEquals(count($employees), 7);
 
     }
 }

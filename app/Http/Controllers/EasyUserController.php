@@ -23,11 +23,6 @@ class EasyUserController extends Controller
 
     public function create_easy_user(Request $request)
     {
-        // dd(\Database\Seeders\Common\Method::getSchedules());
-
-
-
-
         # DBデータの作成
         //1.ユーザの新規作成
         \Database\Seeders\User\EasySeeder::run();
@@ -46,7 +41,6 @@ class EasyUserController extends Controller
         Auth::logout(); //ユーザーセッションの削除
         $request->session()->invalidate(); //全セッションの削除
         $request->session()->regenerateToken(); //セッションの再作成(二重送信の防止)
-
 
 
         # ログイン処理

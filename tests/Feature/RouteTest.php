@@ -9,11 +9,10 @@ use Tests\TestCase;
 class RouteTest extends TestCase
 {
     /**
-     * 簡単ログインユーザーの作成ページの表示テスト
-     *
+     * トップページの表示テスト
      * @return void
      */
-    public function test_create_easy_user()
+    public function test_top()
     {
         $response = $this->get('/');
         $response->assertStatus(200);
