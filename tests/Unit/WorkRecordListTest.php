@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Unit;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -10,11 +10,15 @@ use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 
-class RouteTest extends TestCase
+
+
+
+class WorkRecordListTest extends TestCase
 {
 
     use RefreshDatabase; //テスト用データベースの利用
     use WithoutMiddleware; //ミドルウェアの無効化
+
 
     /**
      * テスト用DBデータの作成と、テストユーザーのログイン処理
@@ -53,15 +57,46 @@ class RouteTest extends TestCase
         $this->assertTrue( Auth::check() );
     }
 
+
     /**
-     * トップページの表示テスト
+     * 日別勤怠管理表ページの表示(date_list)
      * @return void
      */
-    public function test_top()
+    public function test_date_list()
     {
-        $response = $this->get('/');
+        $user = Self::set_up();
+        $response = $this->get('date_list');
+
+        #1.ページの表示テスト
         $response->assertStatus(200);
     }
 
+
+    /**
+     * 月別勤怠管理表ページの表示(month_list)
+     * @return void
+     */
+    public function test_month_list()
+    {
+        $user = Self::set_up();
+        $response = $this->get('month_list');
+
+        #1.ページの表示テスト
+        $response->assertStatus(200);
+    }
+
+
+    /**
+     * 個人別勤怠管理表ページの表示(parsonal_list)
+     * @return void
+     */
+    public function test_parsonal_list()
+    {
+        $user = Self::set_up();
+        $response = $this->get('parsonal_list');
+
+        #1.ページの表示テスト
+        $response->assertStatus(200);
+    }
 
 }
