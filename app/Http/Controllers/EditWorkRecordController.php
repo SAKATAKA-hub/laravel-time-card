@@ -132,7 +132,8 @@ class EditWorkRecordController extends Controller
         $work_time = WorKTime::find($request->work_time['id']);
         $work_time->update([
             'in' => $request->work_time['input_in'].':00',
-            'out' => $request->work_time['input_out'].':00',
+            'out' => !empty($request->work_time['input_out']) ?
+                $request->work_time['input_out'].':00' :null,
         ]);
 
 
@@ -198,25 +199,6 @@ class EditWorkRecordController extends Controller
             compact('comment','work_times', 'total_times')
         ]);
     }
-
-
-
-
-    /**
-     * 休憩の削除(destroy_break_record)
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return redirect
-    */
-    // public function destroy_break_record(Request $request)
-    // {
-    //     # 休憩時間の削除
-    //     $break_time = BreakTime::find($request->break_time_id)->delete();
-
-
-    //     return redirect()->route('edit_work_record',['date'=>$request->date]);
-    // }
-
 
 
 }

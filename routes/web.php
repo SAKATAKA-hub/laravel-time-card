@@ -108,12 +108,11 @@ Route::get('create_easy_user',[EasyUserController::class,'create_easy_user'])
 /*
 |----------------------------------------
 | 勤怠管理表ページの表示
-|---------------------------------------- |
+|----------------------------------------
 */
 # タイムカードページの表示(index)
 Route::get('time_card', [InputWorkRecordController::class,'index'])
-->middleware(['auth']) //ログイン中のみ表示
-->middleware(['delete_easy_user']) //簡単ログインユーザーの削除
+->middleware(['auth','delete_easy_user']) //ログイン中のみ表示
 ->name('time_card');
 
 
@@ -142,24 +141,21 @@ Route::patch('time_card/work_out', [InputWorkRecordController::class,'work_out']
 /*
 |----------------------------------------
 | 勤怠管理表ページの表示
-|---------------------------------------- |
+|----------------------------------------
 */
-# ログイン中のみ表示(auth)
-Route::middleware(['auth'])->group(function ()
+# ログイン中のみ表示(auth), 退勤処理が済んでいないデータの処理(take_over_record)
+Route::middleware(['auth','take_over_record'])->group(function ()
 {
     # 日別勤怠管理表ページの表示(date_list)
     Route::get('date_list', [WorkRecordListController::class,'date_list'])
-    ->middleware(['delete_easy_user']) //簡単ログインユーザーの削除
     ->name('date_list');
 
     # 月別勤怠管理表ページの表示(month_list)
     Route::get('month_list', [WorkRecordListController::class,'month_list'])
-    ->middleware(['delete_easy_user']) //簡単ログインユーザーの削除
     ->name('month_list');
 
     # 個人別勤怠管理表ページの表示(parsonal_list)
     Route::get('parsonal_list', [WorkRecordListController::class,'parsonal_list'])
-    ->middleware(['delete_easy_user']) //簡単ログインユーザーの削除
     ->name('parsonal_list');
 });
 
@@ -173,8 +169,7 @@ Route::middleware(['auth'])->group(function ()
 */
 # 勤怠修正ページの表示(edit_work_record)
 Route::get('edit_work_record', [EditWorkRecordController::class,'index'])
-->middleware(['auth']) //ログイン中のみ表示
-->middleware(['delete_easy_user']) //簡単ログインユーザーの削除
+->middleware(['auth','take_over_record'])
 ->name('edit_work_record');
 
 

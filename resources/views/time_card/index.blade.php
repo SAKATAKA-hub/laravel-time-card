@@ -183,27 +183,11 @@
                         </div>
 
                         <!-- alert -->
-                        <div class="ms-3 me-3">
-                            <div class="alert alert-info alert-dismissible fade show" role="alert"
-                             v-if="alert_index === 0"
-                            >
-                                今日も一日<br>おつかれさまでした！
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-
-                            <div class="alert alert-success alert-dismissible fade show" role="alert"
-                             v-if="alert_index === 1"
-                            >
-                                おはようございます。<br>今日も一日がんばりましょう！
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-
-                            <div class="alert alert-success alert-dismissible fade show" role="alert"
-                             v-if="alert_index === 2"
-                            >
-                                おかえりなさい。<br>引き続きがんばりましょう！
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
+                        <div class="alert alert-dismissible fade show" role="alert"
+                            v-if="alert_index !== null" :class="alerts[alert_index].color"
+                        >
+                            @{{alerts[alert_index].message}}
+                            {{-- <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> --}}
                         </div>
 
 

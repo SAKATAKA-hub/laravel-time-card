@@ -58,6 +58,45 @@ class WorkTime extends Model
 
 
     /**
+     * 直近の休憩記録を呼び出す
+     * ($work_time->last_break)
+     *
+     *
+     * @return String //(00:00-00:00)
+     */
+    public function getLastBreakAttribute()
+    {
+        return BreakTime::where('work_time_id',$this->id)
+            ->orderBy('in','desc')->first();
+    }
+
+
+
+
+    /**
+     * 出勤状態を表示
+     * ($work_time->status)
+     *
+     *
+     * @return Int //[0=>'退勤中', 1=>'出勤中', 2=>'休憩中']
+     */
+    public function getStatusAttribute()
+    {
+        $last_break =  $this::getLastBreakAttribute();
+
+        if( isset($last_break) && empty($last_break->out) ){
+            return 2 ; //休憩中
+        }elseif( empty($this->out) ){
+            return 1 ; //出勤中
+        }else{
+            return 0 ; //退勤中
+        }
+    }
+
+
+
+
+    /**
      * 勤務時間のテキスト表示
      * ($work_time->text)
      *
@@ -73,7 +112,6 @@ class WorkTime extends Model
 
         return sprintf('%s - %s',$in,$out);
     }
-
 
 
 
@@ -94,6 +132,8 @@ class WorkTime extends Model
 
         return $date->format('d日').$weeks[$date->format('w')];
     }
+
+
 
 
     /**

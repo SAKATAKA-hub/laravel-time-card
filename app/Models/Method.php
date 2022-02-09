@@ -24,8 +24,6 @@ class Method  extends Model
     public function getCutMin()
     {
         $m = 15;
-
-
         return $m;
     }
 

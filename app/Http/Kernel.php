@@ -44,6 +44,7 @@ class Kernel extends HttpKernel
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
+
     ];
 
     /**
@@ -65,6 +66,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
         'delete_easy_user' => \App\Http\Middleware\DeleteEasyUser::class, //簡単ログインユーザーの削除
-
+        'take_over_record' => \App\Http\Middleware\TakeOverRecord::class, //退勤処理が済んでいないデータの処理
     ];
 }

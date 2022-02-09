@@ -70,6 +70,12 @@
                 workStatusText : ['退勤中','出勤中','休憩中'],
 
                 alert_index : null,
+                alerts :{
+                    0 : {color:'alert-info', message:'おつかれさまでした！',},
+                    1 : {color:'alert-success', message:'おはようございます。',},
+                    2 : {color:'alert-success', message:'おかえりなさい。引き続きがんばりましょう！',},
+                    3 : {color:' alert-danger', message:'エラーメッセージ',},
+                }
 
 
             }, //end data
@@ -189,9 +195,18 @@
                     })
                     .then(json => {
                         console.log(json);
-                        this.active_employee.work_status = 2 ;
-                        this.employees[this.active_index].work_status = 2 ;
-                        this.alert_index = null;
+
+                        if(json.error){ //エラーコメントがあるとき
+                            this.alert_index = 3;
+                            this.alerts[this.alert_index].message = json.error;
+
+                        }else{
+                            this.active_employee.work_status = 2 ;
+                            this.employees[this.active_index].work_status = 2 ;
+                            this.alert_index = null;
+
+                        }
+
                     })
                     .catch(error => {
                         alert('通信エラーが発生しました。ページを再読み込みします。');
@@ -224,6 +239,7 @@
                         this.active_employee.work_status = 1 ;
                         this.employees[this.active_index].work_status = 1 ;
                         this.alert_index = 2;
+
                     })
                     .catch(error => {
                         alert('通信エラーが発生しました。ページを再読み込みします。');
@@ -253,9 +269,18 @@
                     })
                     .then(json => {
                         console.log(json);
-                        this.active_employee.work_status = 0 ;
-                        this.employees[this.active_index].work_status = 0 ;
-                        this.alert_index = 0;
+
+                        if(json.error){ //エラーコメントがあるとき
+                            this.alert_index = 3;
+                            this.alerts[this.alert_index].message = json.error;
+
+                        }else{
+                            this.active_employee.work_status = 0 ;
+                            this.employees[this.active_index].work_status = 0 ;
+                            this.alert_index = 0;
+
+                        }
+
                     })
                     .catch(error => {
                         alert('通信エラーが発生しました。ページを再読み込みします。');

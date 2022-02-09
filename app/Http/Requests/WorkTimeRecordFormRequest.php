@@ -35,7 +35,18 @@ class WorkTimeRecordFormRequest extends FormRequest
 
         # JSON形式データを配列形式に変換
         $work_time = json_decode($this->work_time ,true);
+        $work_time['input_out'] = $work_time['input_out']==='00:00' ?
+            '24:00': $work_time['input_out'];
+
         $break_times = $work_time['break_times'];
+        for ($i=0; $i < count($break_times); $i++)
+        {
+            $break_times[$i]['input_out'] = $break_times[$i]['input_out']=== '00:00' ?
+                 '24:00': $break_times[$i]['input_out'];
+        }
+        $work_time['break_times'] = $break_times;
+
+
         $this->merge([
             'work_time' => $work_time,
             'delete_break_times' => json_decode($this->delete_break_times ,true),

@@ -45,7 +45,7 @@ class WorkRecordTest extends TestCase
         // $response->assertRedirect('date_list');
         # セッションにログイン情報が保存されたかチェック
         $this->assertTrue( true );
-        // $this->assertTrue( Auth::check() );
+        $this->assertTrue( Auth::check() );
     }
 
     /**

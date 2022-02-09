@@ -37,37 +37,20 @@ class Employee extends Model
     |--------------------------------------------------------------------------
     */
 
+
     /**
-     * 従業員の出勤状態
-     * ($employee->work_status)
+     * 直近の勤務記録を呼び出す
+     * ($employee->last_work)
      *
      *
-     * @return Int //[0=>'退勤中', 1=>'出勤中', 2=>'休憩中']
+     * @return String //(00:00-00:00)
      */
-    public function getWorkStatusAttribute()
+    public function getLastWorkAttribute()
     {
-        // 直近の勤務記録
-        $work_time = WorkTime::where('employee_id',$this->id)
-        ->orderBy('date','desc')
-        ->orderBy('in','desc')
-        ->first();
-
-        // 直近の勤務の最後の休憩記録
-        $break_time = BreakTime::where('work_time_id',$work_time->id)
-        ->orderBy('in','desc')
-        ->first();
-
-        // 従業員の出勤
-        $work_status = 0;
-        if( isset($break_time) && empty($break_time->out) ){
-            $work_status = 2;
-        }
-        else if( isset($work_time) && empty($work_time->out) ){
-            $work_status = 1;
-        }
-
-        return $work_status;
+        return WorkTime::where('employee_id',$this->id)
+            ->orderBy('date','desc')->orderBy('in','desc')->first();
     }
+
 
 
 
