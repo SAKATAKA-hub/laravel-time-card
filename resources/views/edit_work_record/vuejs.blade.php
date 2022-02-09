@@ -37,6 +37,9 @@
                 remember_work_time : [],
                 delete_break_times : [],
 
+                // mountedを読込んだら、表示
+                mounted : false,
+
             }, //end data
 
 
@@ -63,10 +66,10 @@
                     console.log(json);
                     this.work_times = json.work_times;
                     this.total_times = json.total_times;
+                    this.mounted = true;
 
-                    /* --------------------------------------------------------------------------
-                    | テスト作業用コード
-                    */
+
+                    // test用 -----------------------------------------
                     if(this.form_test){
                         let index = 2;
                         this.editing_index = index;
@@ -75,8 +78,7 @@
                         this.editing_work_time = this.assign_time(assign_ob);
                         this.remember_work_time = this.assign_time(assign_ob);
 
-                    }
-                    //----------------------------------------------------------------------------
+                    }//-------------------------------------------------
 
                 })
                 .catch(error => {

@@ -75,8 +75,9 @@
                     1 : {color:'alert-success', message:'おはようございます。',},
                     2 : {color:'alert-success', message:'おかえりなさい。引き続きがんばりましょう！',},
                     3 : {color:' alert-danger', message:'エラーメッセージ',},
-                }
+                },
 
+                mounted : false,
 
             }, //end data
 
@@ -102,14 +103,16 @@
                     // JSONをdataにコピー
                     console.log(json);
                     this.employees = json.employees;
+                    this.mounted = true;
 
 
+                    // test用 -----------------------------------------
                     if(this.form_test){
                         //'active_employee'に選択中従業員のデータをコピーする
                         let e_index = 0;
                         this.active_employee = Object.assign({},this.employees[e_index]);
                         this.active_index = e_index;
-                    }
+                    }//-------------------------------------------------
 
 
                 })

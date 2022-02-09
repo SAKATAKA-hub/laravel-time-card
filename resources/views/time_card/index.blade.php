@@ -33,11 +33,12 @@
     <meta name="user_id" content="{{$user_id}}">
 
     <style>
-        main #showTime{
-            /* display: flex;
-            align-items: center; */
+        [v-cloak]{
+            display: none;
+            opacity: 0;
+        }
 
-            /* height: 3rem; */
+        main #showTime{
             text-align: center;
             font-weight: bold;
         }
@@ -103,7 +104,7 @@
 {{-- メインコンテンツ --}}
 @section('main_content')
 
-    <div v-show="form_test">
+    <div v-show="form_test" class="cloak" v-cloak>
         <div class="mb-3 p-3 bg-white">
             <h3 class="border-bottom mb-3">JSONテスト</h3>
 
@@ -134,8 +135,8 @@
     </div>
 
 
-    <div class="d-md-flex">
-        <section class="mb-5" style="flex:1;">
+    <div class="d-md-flex"  v-cloak>
+        <section class="mb-5" :class="{'d-none': !mounted}" style="flex:1;">
 
             <!--現在時刻の表示領域-->
             <div id="showTime" class="mt-3">

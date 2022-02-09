@@ -38,6 +38,11 @@
     <meta name="date" content="{{$date}}">
 
     <style>
+        [v-cloak]{
+            display: none;
+            opacity: 0;
+        }
+
         .err_input{
             background-color: pink;
         }
@@ -96,7 +101,7 @@
 
     <!-- テストコンテナー -->
 
-    <div v-show="form_test">
+    <div v-show="form_test" v-cloak>
         @include('test.edit_work_record')
     </div>
 
@@ -104,7 +109,7 @@
 
 
     <!-- TableContainer -->
-    <div class="table_container mb-5">
+    <div class="table_container mb-5" v-cloak :class="{'d-none': !mounted}">
 
         <!--テーブル-->
         <table class="table bg-white text-center" style="width: 900px;">
