@@ -17,7 +17,7 @@ class NavMenuComposer
         $links = [
             'time_card' =>
             [
-                'href' => asset('time_card'),
+                'href' => route('time_card'),
                 'text' => 'タイムカード',
                 'activ_class' => '',
                 'aria-current' => '',
@@ -25,7 +25,7 @@ class NavMenuComposer
 
             'date_list' =>
             [
-                'href' => asset('date_list'),
+                'href' => route('date_list'),
                 'text' => '日別勤怠管理表',
                 'activ_class' => '',
                 'aria-current' => '',
@@ -33,7 +33,7 @@ class NavMenuComposer
 
             'month_list' =>
             [
-                'href' => asset('month_list'),
+                'href' => route('month_list'),
                 'text' => '月別勤怠管理表',
                 'activ_class' => '',
                 'aria-current' => '',
@@ -41,7 +41,7 @@ class NavMenuComposer
 
             'parsonal_list' =>
             [
-                'href' => asset('parsonal_list'),
+                'href' => route('parsonal_list'),
                 'text' => '個人別勤怠管理表',
                 'activ_class' => '',
                 'aria-current' => '',
@@ -49,7 +49,7 @@ class NavMenuComposer
 
             'edit_work_record' =>
             [
-                'href' => asset('edit_work_record'),
+                'href' => route('edit_work_record'),
                 'text' => '勤怠修正',
                 'activ_class' => '',
                 'aria-current' => '',

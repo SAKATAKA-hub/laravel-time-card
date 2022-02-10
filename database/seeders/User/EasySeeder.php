@@ -23,7 +23,7 @@ class EasySeeder extends Seeder
         $now = Carbon::parse('now');
 
         $user = new User([
-            'name' => 'ワンタイムユーザー',
+            'name' => $now->format('m月d日ゲスト'),
             'email' => $now->format('YmdHis').'@mail.co.jp',
             'password'  =>  Hash::make('password'),
             'easy_user' => 1,

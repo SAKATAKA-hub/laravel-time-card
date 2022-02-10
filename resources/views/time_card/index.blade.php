@@ -43,7 +43,7 @@
             font-weight: bold;
         }
         main #showTime #nowDay{
-            font-size: 1.0rem;
+            font-size: 2rem;
         }
         main  #showTime #nowAmPm{
             display: inline;
@@ -53,7 +53,7 @@
         main #showTime #nowTime{
             display: inline;
             margin-left: .5rem;
-            font-size: 3rem;
+            font-size: 4rem;
         }
         main #showTime #nowSec{
             display: inline;
@@ -104,6 +104,7 @@
 {{-- メインコンテンツ --}}
 @section('main_content')
 
+    <!--テスト用コンテナ-->
     <div v-show="form_test" class="cloak" v-cloak>
         <div class="mb-3 p-3 bg-white">
             <h3 class="border-bottom mb-3">JSONテスト</h3>
@@ -135,21 +136,23 @@
     </div>
 
 
-    <div class="d-md-flex"  v-cloak>
-        <section class="mb-5" :class="{'d-none': !mounted}" style="flex:1;">
 
-            <!--現在時刻の表示領域-->
-            <div id="showTime" class="mt-3">
-                <div id="nowDay"></div>
-                <div id="nowAmPm"></div>
-                <div id="nowTime"></div>
-                <div id="nowSec"></div>
-            </div>
+    <!--現在時刻の表示領域-->
+    <div id="showTime" class="mt-3">
+        <div id="nowDay"></div>
+        <div id="nowAmPm"></div>
+        <div id="nowTime"></div>
+        <div id="nowSec"></div>
+    </div>
+
+
+    <div class="d-flex justify-content-center flex-column align-items-center flex-md-row"  v-cloak>
+        <section class=" me-md-5 mb-5" :class="{'d-none': !mounted}" style="">
 
             <div class="time_card_container">
 
                 <!-- v-if 従業員選択中 -->
-                <div class="card" style="min-height:23rem;"
+                <div class="card" style="width:20rem; min-height:23rem;"
                  v-if="Object.keys(active_employee).length"
                  :class="{
                     'bg-secondary':active_employee.work_status===0,
@@ -166,15 +169,12 @@
                     <div class="card-body">
 
                         <div>
-                            <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
+                            <i class="material-icons d-block" style="color:#6c757d; font-size:8rem;"
                              v-if="active_employee.work_status===0"
-                             style="background-color:#6c757d; border:16px solid #6c757d;" width="100" height="100"
-                            >
-                            <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
-                             v-else
-                             :style=" 'background-color:'+active_employee.color+'; border:16px solid '+active_employee.color+';' "
-                             width="100" height="100"
-                            >
+                            >account_circle</i>
+                            <i class="material-icons d-block" style="font-size:8rem;"
+                             v-else :style=" 'color:'+ active_employee.color +';' "
+                            >account_circle</i>
                         </div>
 
                         <div>
@@ -218,15 +218,12 @@
 
 
                 <!-- v-else 従業員が選択されていない -->
-                <div class="card" style="min-height:23rem;" v-else>
+                <div class="card" style="width:20rem; min-height:23rem;" v-else>
                     <div class="border-bottom" style="height:3rem; line-height:3rem;">
                     </div>
 
                     <div class="card-body">
-                        <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
-                         style="background-color:#6c757d; border:16px solid #6c757d;" width="100" height="100"
-                        >
-
+                        <i class="material-icons d-block" style="color:#6c757d; font-size:8rem;">account_circle</i>
                         <div>
                             <h4 class="fw-bold text-secondary">従業員を選択してください</h4>
                         </div>
@@ -247,23 +244,26 @@
                  :class="{'list-group-item-primary':active_index===e_index}"
                  @click="selectEmployee(e_index)"
                 >
-                    <div class="ms-2 me-auto">
+                    <div><!-- 従業員　画像 -->
+                        <!-- 退勤中 -->
+                        <i class="material-icons ms-1 me-1" style="color:#6c757d; font-size:1.5rem;"
+                         v-if="employee.work_status===0"
+                        >account_circle</i>
+                        <!-- 出勤中 -->
+                        <i class="material-icons d-block" style="font-size:2rem;"
+                         v-else :style=" 'color:'+ employee.color +';' "
+                        >account_circle</i>
+                    </div>
 
-                        <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3"
-                            v-if="employee.work_status===0"
-                            style="background-color:#6c757d; border:5px solid #6c757d;" width="30" height="30"
-                        ><!-- 退勤中 背景色:secondary -->
-                        <img src="{{asset('svg/employee.svg')}}" class="rounded-circle mt-3 mb-3" width="30" height="30"
-                            v-else
-                            :style=" 'background-color:'+employee.color+'; border:5px solid '+employee.color+';' "
-                        ><!-- 出勤中 背景色:employee_color -->
-
+                    <div class="ms-2 me-auto"><!-- 従業員　名前 -->
                         <p class="d-inline ms-2" :class="{'text-secondary':employee.work_status===0}">@{{employee.name}}</p>
                     </div>
 
-                    <div v-if="employee.work_status === 0" class="ms-5 me-5 fw-bold text-secondary">退勤中</div>
-                    <div v-if="employee.work_status === 1" class="ms-5 me-5 fw-bold text-success">出勤中</div>
-                    <div v-if="employee.work_status === 2" class="ms-5 me-5 fw-bold text-warning">休憩中</div>
+                    <div><!-- 出勤状態 -->
+                        <div v-if="employee.work_status === 0" class="ms-5 me-5 fw-bold text-secondary">退勤中</div>
+                        <div v-if="employee.work_status === 1" class="ms-5 me-5 fw-bold text-success">出勤中</div>
+                        <div v-if="employee.work_status === 2" class="ms-5 me-5 fw-bold text-warning">休憩中</div>
+                    </div>
 
                 </li>
 

@@ -107,7 +107,7 @@
 
 
 
-                            <a href="{{route('create_easy_user')}}" class="ml-1 underline">
+                            <a href="{{route('easy_user.waiting')}}" class="ml-1 underline">
                                 create easy user
                             </a>
 

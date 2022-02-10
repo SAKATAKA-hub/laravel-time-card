@@ -67,7 +67,7 @@
         <button type="button" class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#ChangeDateModal">
             <i class="bi bi-calendar2"></i>
             {{-- <i class="bi bi-person-fill"></i> --}}
-            <div class="d-none d-md-inline ms-1">日付の選択</div>
+            <div class="d-none d-md-inline ms-1">日付の変更</div>
         </button>
 
 
@@ -82,7 +82,7 @@
         <table class="table bg-white text-center" style="width: 900px;">
             <thead class="border-secondary">
                 <tr>
-                    <th scope="col">氏 名</th>
+                    <th scope="col" colspan="2">氏 名</th>
                     <th scope="col">就 業</th>
                     <th scope="col">休 憩</th>
                     <th scope="col">勤務時間(h)</th>
@@ -95,14 +95,18 @@
 
                 @forelse ($work_times as $work_time)
                 <tr>
-                    <th scope="row" class="text-start">
-                        <img src="{{asset('svg/employee.svg')}}" class="rounded-circle ms-3 mb-1" width="20" height="20"
-                            style="background-color:{{$work_time->employee->color}}; border:5px solid {{$work_time->employee->color}};' "
-                        >
-                        {{$work_time->employee->name}}
+                    <th scope="row" class="text-end">
+                        <i class="material-icons me-1" style="color:{{$work_time->employee->color}}; font-size:1.5rem;">account_circle</i>
                     </th>
+                    <th class="text-start">{{$work_time->employee->name}}</th>
                     <td>{{$work_time->text}}</td>
-                    <td></td>
+
+                    <!--break_times -->
+                    <td>
+                        @foreach ($work_time->break_times as $break_time)
+                        <div>{{$break_time->text}}</div>
+                        @endforeach
+                    </td>
 
                     <td>{{$work_time->restrain_hour}}</td> <!-- 勤務時間(h) -->
                     <td>{{$work_time->break_hour}}</td> <!-- 休憩時間(h) -->
@@ -110,22 +114,11 @@
                     <td>{{$work_time->night_hour}}</td> <!-- 深夜時間(h) -->
                 </tr>
 
-                    @foreach ($work_time->break_times as $break_time)
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td>{{$break_time->text}}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    @endforeach
 
                 <!-- 勤務記録が存在しないとき -->
                 @empty
                     <tr>
-                        <th colspan="7" class="text-secondary">
+                        <th colspan="8" class="text-secondary">
                             勤務記録がありません
                         </th>
                     </tr>
@@ -134,6 +127,7 @@
             </tbody>
             <tfoot class="border-secondary">
                 <tr>
+                    <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col"></th>

@@ -91,7 +91,7 @@
         <!-- 日付変更モーダルボタン -->
         <button type="button" class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#ChangeDateModal">
             <i class="bi bi-calendar2"></i>
-            <div class="d-none d-md-inline ms-1">日付の選択</div>
+            <div class="d-none d-md-inline ms-1">日付の変更</div>
         </button>
 
 
@@ -115,7 +115,7 @@
         <table class="table bg-white text-center" style="width: 900px;">
             <thead class="border-secondary">
                 <tr>
-                    <th scope="col">氏 名</th>
+                    <th scope="col" colspan="2">氏 名</th>
                     <th scope="col">就 業</th>
                     <th scope="col">休 憩</th>
                     <th scope="col">勤務時間(h)</th>
@@ -127,12 +127,22 @@
                 </tr>
             </thead>
 
-            <!-- v-for worrk_times -->
-            <tbody v-for="(work_time, w_index) in work_times"  class="border-0">
-                <tr>
-                    <th scope="row">@{{work_time.employee.name}}</th>
+
+            <tbody>
+                <!-- v-for worrk_times -->
+                <tr v-for="(work_time, w_index) in work_times">
+                    <th scope="row" class="text-end">
+                        <i class="material-icons me-1 mb-0" style="font-size:1.5rem;" :style=" 'color:'+work_time.employee.color+';' ">account_circle</i>
+                    </th>
+                    <th class="text-start">@{{work_time.employee.name}}</th>
                     <td>@{{work_time.text}}</td>
-                    <td></td>
+
+                    <!--break_times -->
+                    <td>
+                        <div v-for="(break_time, b_index) in work_time.break_times">
+                            @{{break_time.text}}
+                        </div>
+                    </td>
 
                     <td>@{{work_time.restrain_hour}}</td> <!-- 勤務時間(h) -->
                     <td>@{{work_time.break_hour}}</td> <!-- 休憩時間(h) -->
@@ -150,30 +160,15 @@
                         </button>
                     </td>
                 </tr>
-
-                <!-- v-for break_times -->
-                <tr v-for="(break_time, b_index) in work_time.break_times">
-                    <td></td>
-                    <td></td>
-                    <td>@{{break_time.text}}</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <!-- end v-for break_times -->
-
+                <!-- end v-for worrk_times -->
 
             </tbody>
-            <!-- end v-for worrk_times -->
 
 
             <!-- 勤務記録が存在しないとき -->
             <tbody  v-show="!work_times.length" class="border-0">
                 <tr>
-                    <th colspan="9" class="text-secondary">
+                    <th colspan="10" class="text-secondary">
                         勤務記録がありません
                     </th>
                 </tr>
@@ -182,6 +177,7 @@
 
             <tfoot class="border-secondary" v-if="Object.keys(total_times).length">
                 <tr>
+                    <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col"></th>

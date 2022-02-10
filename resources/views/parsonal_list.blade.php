@@ -60,13 +60,7 @@
 
         <!--表示中の年月 従業員名-->
         <div class="fs-3">
-            {{$date_ob->format('Y年m月')}}
-
-            <img src="{{asset('svg/employee.svg')}}" class="rounded-circle ms-3 mb-1" width="26" height="26"
-                style="background-color:{{$employee->color}}; border:5px solid {{$employee->color}};' "
-            >
-
-            {{$employee->name}}
+            <span class="me-3">{{$date_ob->format('Y年m月')}}</span>
         </div>
 
         <!--翌月-->
@@ -78,11 +72,17 @@
         <button type="button" class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#ChangeDateModal">
             {{-- <i class="bi bi-calendar2"></i> --}}
             <i class="bi bi-person-fill"></i>
-            <div class="d-none d-md-inline ms-1">年月・従業員の選択</div>
+            <div class="d-none d-md-inline ms-1">年月・従業員の変更</div>
         </button>
 
 
     </div>
+
+    <div class="d-flex align-items-center mb-1">
+        <i class="material-icons" style="color:{{$employee->color}}; font-size:2rem;">account_circle</i>
+        <span class="ms-1 fs-3">{{$employee->name}}</span>
+    </div>
+
 
 
 
@@ -108,7 +108,13 @@
                 <tr>
                     <td>{{$work_time->date_text}}</td>
                     <td>{{$work_time->text}}</td>
-                    <td></td>
+
+                    <!--break_times -->
+                    <td>
+                        @foreach ($work_time->break_times as $break_time)
+                        <div>{{$break_time->text}}</div>
+                        @endforeach
+                    </td>
 
                     <td>{{$work_time->restrain_hour}}</td> <!-- 勤務時間(h) -->
                     <td>{{$work_time->break_hour}}</td> <!-- 休憩時間(h) -->
@@ -116,17 +122,6 @@
                     <td>{{$work_time->night_hour}}</td> <!-- 深夜時間(h) -->
                 </tr>
 
-                    @foreach ($work_time->break_times as $break_time)
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td>{{$break_time->text}}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    @endforeach
 
                 <!-- 勤務記録が存在しないとき -->
                 @empty

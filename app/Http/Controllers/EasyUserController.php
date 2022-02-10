@@ -52,7 +52,7 @@ class EasyUserController extends Controller
         if (Auth::attempt($credentials))
         {
             $request->session()->regenerate();
-            return redirect()->route('date_list');
+            return redirect()->route('time_card')->with('popup_message','お試し用のアカウントの作成が成功しました！');
         }
 
         // ログイン失敗の処理

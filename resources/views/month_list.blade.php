@@ -69,7 +69,7 @@
         <!-- 年月変更モーダルボタン -->
         <button type="button" class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#ChangeDateModal">
             <i class="bi bi-calendar2"></i>
-            <div class="d-none d-md-inline ms-1">年月の選択</div>
+            <div class="d-none d-md-inline ms-1">年月の変更</div>
         </button>
 
 
@@ -84,7 +84,7 @@
         <table class="table bg-white text-center" style="width: 900px;">
             <thead class="border-secondary">
                 <tr>
-                    <th scope="col">氏 名</th>
+                    <th scope="col" colspan="2">氏 名</th>
                     <th scope="col"></th>
                     <th scope="col">総勤務時間(h)</th>
                     <th scope="col">総休憩時間(h)</th>
@@ -96,12 +96,12 @@
 
                 @forelse ($employees as $employee)
                 <tr>
-                    <th scope="row" class="text-start">
-                        <img src="{{asset('svg/employee.svg')}}" class="rounded-circle ms-3 mb-1" width="20" height="20"
-                            style="background-color:{{$employee->color}}; border:5px solid {{$employee->color}};' "
-                        >
-                        {{$employee->name}}
+                    <th scope="row" class="text-end">
+                        <i class="material-icons me-1" style="color:{{$employee->color}}; font-size:1.5rem;">account_circle</i>
                     </th>
+                    <th class="text-start">{{$employee->name}}</th>
+
+
                     <td></td>
 
                     <td scope="col">{{$employee->total_times['restrain_hour']}}</td> <!-- 総勤務時間(h) -->
@@ -113,7 +113,7 @@
                 <!-- 勤務記録が存在しないとき -->
                 @empty
                     <tr>
-                        <th colspan="10" class="text-secondary">
+                        <th colspan="7" class="text-secondary">
                             勤務記録がありません
                         </th>
                     </tr>
@@ -122,6 +122,7 @@
             </tbody>
             <tfoot class="border-secondary">
                 <tr>
+                    <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col">{{$total_times['restrain_hour']}}</th> <!-- 総勤務時間(h) -->

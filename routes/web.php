@@ -22,7 +22,7 @@ use App\Http\Controllers\TestController;
 |
 */
 
-Route::get('/', function () {
+Route::get('top', function () {
     return view('welcome');
 })
 ->name('top');
@@ -39,8 +39,14 @@ Route::get('vuejs', function () {
     return view('test.vuejs');
 });
 
+Route::get('test', function () {
+    return view('test.test');
+});
 
-
+Route::get('hoge', function () {
+    return 'ほげ';
+})
+->name('hoge');
 
 /*
 | --------------------------------------------------------
@@ -66,6 +72,11 @@ Route::post('logout',[AuthController::class,'logout'])->middleware('auth')
 
 
 
+/*
+| --------------------------------------------------------
+| ユーザー登録
+| --------------------------------------------------------
+*/
 # ユーザー登録画面の表示(get_register)
 Route::get('get_register',function(){
     return view('login.register_form');
@@ -98,9 +109,22 @@ Route::middleware(['auth'])->group(function ()
 
 });
 
-# 簡単ログインユーザーの作成
+
+
+
+/*
+| --------------------------------------------------------
+| 簡単ログインユーザー
+| --------------------------------------------------------
+*/
+# データ作成処理
 Route::get('create_easy_user',[EasyUserController::class,'create_easy_user'])
 ->name('create_easy_user');
+
+# データ作成中ページの表示
+Route::get('easy_user/waiting', function () {
+    return view('easy_user.waiting');
+})->name('easy_user.waiting');
 
 
 
@@ -111,7 +135,7 @@ Route::get('create_easy_user',[EasyUserController::class,'create_easy_user'])
 |----------------------------------------
 */
 # タイムカードページの表示(index)
-Route::get('time_card', [InputWorkRecordController::class,'index'])
+Route::get('/', [InputWorkRecordController::class,'index'])
 ->middleware(['auth','delete_easy_user']) //ログイン中のみ表示
 ->name('time_card');
 
